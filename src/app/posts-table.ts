@@ -1,5 +1,5 @@
-import { Table } from "../lib/table/table.js";
-import { usersTable } from "./users-table.js";
+import { Table } from "../lib/table/table";
+import { usersTable } from "./users-table";
 
 export interface Post {
   id: number;

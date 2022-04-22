@@ -5,8 +5,11 @@ import { usersTable } from './app/users-table';
 import { initTables } from "./lib/table/init-tables";
 
 const config: Knex.Config = {
-  client: 'sqlite3',
-  connection: 'file:memDb?mode=memory&cache=shared', 
+  client: 'better-sqlite3',
+  // connection: 'file:memDb?mode=memory&cache=shared', 
+  connection: {
+    filename: 'file:memDb?mode=memory&cache=shared',
+  }, 
   pool: {
     min: 1,
     max: 1,
