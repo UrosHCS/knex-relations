@@ -10,23 +10,23 @@ export class BelongsTo<Parent extends Row, Child extends Row> extends Relation<P
     return this.childTable.query().whereIn(this.childTable.primaryKey, parentForeignIds);
   }
 
-  public async populate(parents: Parent[]): Promise<void> {
+  public async populate(parents: Parent[], relationName: keyof Parent): Promise<void> {
     const foreignKey = this.getForeignKeyName();
 
     const foreignIds = parents.map(parent => parent[foreignKey]);
 
     const children = await this.load(foreignIds as ID[]);
 
-    this.mapChildrenToParents(parents, children);
+    this.mapChildrenToParents(parents, children, relationName);
   }
 
-  public mapChildrenToParents(parents: Parent[], children: Child[]): void {
+  public mapChildrenToParents(parents: Parent[], children: Child[], relationName: keyof Parent): void {
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {
       const parentPK = parent[this.parentTable.primaryKey] as ID;
       const child = childDictionary[parentPK];
-      this.setRelation(parent, child || null);
+      this.setRelation(relationName, parent, child || null);
     }
   }
 
@@ -36,6 +36,7 @@ export class BelongsTo<Parent extends Row, Child extends Row> extends Relation<P
     return children.reduce<Record<ID, Child>>((dictionary, child) => {
       const childId = child[childPK] as ID;
       dictionary[childId] = child;
+
       return dictionary;
     }, {});
   }

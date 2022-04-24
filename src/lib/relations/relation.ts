@@ -6,7 +6,6 @@ export abstract class Relation<Parent extends Row, Child extends Row> {
   constructor(
     protected parentTable: Table<Parent>,
     protected childTable: Table<Child>,
-    protected relationName: string,
   ) {}
 
   /**
@@ -23,18 +22,16 @@ export abstract class Relation<Parent extends Row, Child extends Row> {
   public abstract queryFor(ids: ID[]): Knex.QueryBuilder<Child>;
 
   /**
-   * Assign the given children to the given parents. The key will be this.relationName.
+   * Assign the given children to the given parents, where the key will be the relationName.
    */
-  public abstract mapChildrenToParents(parents: Parent[], children: Child[]): void;
+  public abstract mapChildrenToParents(parents: Parent[], children: Child[], relationName: keyof Parent): void;
 
   /**
    * Load children and assign them to the given parents.
    */
-  public abstract populate(parents: Parent[]): Promise<void>;
+  public abstract populate(parents: Parent[], relationName: keyof Parent): Promise<void>;
 
-  protected setRelation(parent: Parent, children: unknown): void {
-    // @ts-ignore
-    parent[this.relationName] = children;
+  protected setRelation(relationName: keyof Parent, parent: Parent, children: unknown): void {
+    parent[relationName] = children as Parent[keyof Parent];
   }
-
 }

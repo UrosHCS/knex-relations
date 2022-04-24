@@ -1,38 +1,54 @@
 import knex from "knex";
 import { BelongsTo } from "../relations/belongs-to";
+import { BelongsToMany } from "../relations/belongs-to-many";
 import { HasMany } from "../relations/has-many";
+import { HasOne } from "../relations/has-one";
 import { Relation } from "../relations/relation";
 import { Row } from "../types";
 
+type Relations<Parent> = Record<string, Relation<Parent, any>>;
+
 export class Table<Model extends Row> {
-  relations: Record<string, Relation<Model, any>> = {};
+  relations: Relations<Model> = {};
 
   constructor(
     public readonly name: string,
     public readonly singular: string,
     public readonly primaryKey: string = 'id',
-    private relationBuilder?: (table: Table<Model>) => void
   ) {}
 
-  init() {
-    if (this.relationBuilder) {
-      this.relationBuilder(this);
+  // fullPK() {
+  //   return `${this.name}.${this.primaryKey}`;
+  // }
+
+  setRelations(relations: Relations<Model>) {
+    this.relations = relations;
+  }
+
+  getRelation<Child extends Row>(relationName: string): Relation<Model, Child> {
+    const relation = this.relations[relationName];
+    if (!relation) {
+      throw new Error(`Relation ${relationName} does not exit on table ${this.name}`);
     }
+
+    return relation;
   }
 
-  fullPK() {
-    return `${this.name}.${this.primaryKey}`;
+  hasMany<ChildModel extends Row>(childTable: Table<ChildModel>) {
+    return new HasMany<Model, ChildModel>(this, childTable);
   }
 
-  hasMany<ChildModel extends Row>(relationName: string, childTable: Table<ChildModel>): void {
-    this.relations[relationName] = new HasMany<Model, ChildModel>(this, childTable, relationName);
+  hasOne<ChildModel extends Row>(childTable: Table<ChildModel>) {
+    return new HasOne<Model, ChildModel>(this, childTable);
   }
 
-  belongsTo<ChildModel extends Row>(relationName: string, childTable: Table<ChildModel>): void {
-    this.relations[relationName] = new BelongsTo<Model, ChildModel>(this, childTable, relationName);
+  belongsTo<ChildModel extends Row>(childTable: Table<ChildModel>) {
+    return new BelongsTo<Model, ChildModel>(this, childTable);
   }
 
-  // hasOne, belongsToMany
+  belongsToMany<ChildModel extends Row>(childTable: Table<ChildModel>) {
+    return new BelongsToMany<Model, ChildModel>(this, childTable);
+  }
 
   query() {
     return knex<Model>(this.name);
@@ -45,11 +61,6 @@ export class Table<Model extends Row> {
   }
 
   loadRelation(results: Model[], relationName: string): Promise<void> {
-    const relation = this.relations[relationName];
-    if (!relation) {
-      throw new Error(`Relation ${relationName} does not exit on table ${this.name}`);
-    }
-
-    return relation.populate(results);
+    return this.getRelation(relationName).populate(results, relationName);
   }
 }

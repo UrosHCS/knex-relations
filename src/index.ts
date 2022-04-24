@@ -2,7 +2,6 @@ import { Knex } from 'knex';
 import knex from 'knex';
 import { postsTable } from './app/posts-table';
 import { usersTable } from './app/users-table';
-import { initTables } from "./lib/table/init-tables";
 
 const config: Knex.Config = {
   client: 'better-sqlite3',
@@ -20,7 +19,6 @@ const config: Knex.Config = {
 
 async function run() {
   knex(config);
-  initTables([postsTable, usersTable]);
 
   console.log(usersTable.name);
   console.log(postsTable.name);

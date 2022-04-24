@@ -8,6 +8,8 @@ export interface Post {
   user_id: number;
 }
 
-export const postsTable = new Table<Post>('posts', 'post', 'id', table => {
-  table.belongsTo('user', usersTable);
-});
+export const postsTable = new Table<Post>('posts', 'post', 'id');
+
+postsTable.relations = {
+  user: postsTable.belongsTo(usersTable),
+}

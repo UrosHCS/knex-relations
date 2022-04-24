@@ -7,6 +7,8 @@ export interface User {
   name: string;
 }
 
-export const usersTable = new Table<User>('users', 'user', 'id', table => {
-  table.hasMany('posts', postsTable);
+export const usersTable = new Table<User>('users', 'user', 'id');
+
+usersTable.setRelations({
+  posts: usersTable.hasMany(postsTable),
 });
