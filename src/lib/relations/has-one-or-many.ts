@@ -10,18 +10,14 @@ export abstract class HasOneOrMany<Parent extends Row, Child extends Row> extend
     return this.childTable.query().whereIn(this.getForeignKeyName(), parentIds);
   }
 
-  public async populate(parents: Parent[], relationName: keyof Parent): Promise<void> {
-    const parentIds = parents.map(parent => parent[this.parentTable.primaryKey]);
-
-    const children = await this.load(parentIds as ID[]);
-
-    this.mapChildrenToParents(parents, children, relationName);
-  }
-
   /**
    * Get column name in the child table that points to the parent table.
    */
   protected getForeignKeyName() {
     return `${this.parentTable.singular}_id`;
+  }
+
+  protected getParentRelationKey() {
+    return this.parentTable.primaryKey;
   }
 }

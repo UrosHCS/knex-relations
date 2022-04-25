@@ -19,14 +19,6 @@ export class BelongsToMany<Parent extends Row, Child extends Row> extends Relati
       .whereIn(`${pivotTable}.${this.getParentForeignKey()}`, parentIds);
   }
 
-  public async populate(parents: Parent[], relationName: keyof Parent): Promise<void> {
-    const parentIds = parents.map(parent => parent[this.parentTable.primaryKey]);
-
-    const children = await this.load(parentIds as ID[]);
-
-    this.mapChildrenToParents(parents, children, relationName);
-  }
-
   public mapChildrenToParents(parents: Parent[], children: Child[], relationName: keyof Parent): void {
     const childDictionary = this.buildDictionary(children);
 
@@ -48,6 +40,10 @@ export class BelongsToMany<Parent extends Row, Child extends Row> extends Relati
       dictionary[foreignValue].push(child);
       return dictionary;
     }, {});
+  }
+
+  protected getParentRelationKey() {
+    return this.parentTable.primaryKey;
   }
 
   /**

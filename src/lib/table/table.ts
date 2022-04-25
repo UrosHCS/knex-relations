@@ -9,19 +9,18 @@ import { Row } from "../types";
 type Relations<Parent> = Record<string, Relation<Parent, any>>;
 
 export class Table<Model extends Row> {
-  relations: Relations<Model> = {};
+  relations: Relations<Model>;
 
   constructor(
     public readonly name: string,
     public readonly singular: string,
     public readonly primaryKey: string = 'id',
-  ) {}
+    relationBuilder?: (table: Table<Model>) => Relations<Model>,
+  ) {
+    this.relations = relationBuilder ? relationBuilder(this) : {};
+  }
 
-  // fullPK() {
-  //   return `${this.name}.${this.primaryKey}`;
-  // }
-
-  setRelations(relations: Relations<Model>) {
+  setRelations(relations: Relations<Model>): void {
     this.relations = relations;
   }
 
@@ -60,7 +59,7 @@ export class Table<Model extends Row> {
     }));
   }
 
-  loadRelation(results: Model[], relationName: string): Promise<void> {
+  loadRelation<C, R extends string>(results: Model[], relationName: R): Promise<Array<Model & { [key in R]: C }>> {
     return this.getRelation(relationName).populate(results, relationName);
   }
 }

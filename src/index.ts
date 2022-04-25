@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 import knex from 'knex';
-import { postsTable } from './app/posts-table';
+import { Post, postsTable } from './app/posts-table';
 import { usersTable } from './app/users-table';
 
 const config: Knex.Config = {
@@ -24,10 +24,17 @@ async function run() {
   console.log(postsTable.name);
 
   try {
-    const users = await usersTable.query().select('id', 'email').where((qb) => {
+    const miniUsers = await usersTable.query().select('id', 'email').where((qb) => {
       qb.where('name', '=', 3);
     });
+
+    const users = await usersTable.query().select('*');
+
     console.log(users);
+
+    const usersWithPosts = await usersTable.loadRelation<Post, 'posts'>(users, 'posts');
+    return usersWithPosts;
+
   } catch (err) {
     console.log(err);
   }

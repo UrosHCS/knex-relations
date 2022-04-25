@@ -1,5 +1,5 @@
 import { Table } from "../lib/table/table";
-import { postsTable } from "./posts-table";
+import { Post, postsTable } from "./posts-table";
 
 export interface User {
   id: number;
@@ -7,8 +7,13 @@ export interface User {
   name: string;
 }
 
-export const usersTable = new Table<User>('users', 'user', 'id');
+export const table = new Table<User>('users', 'user', 'id');
 
-usersTable.setRelations({
-  posts: usersTable.hasMany(postsTable),
-});
+const relations = {
+  posts: table.hasMany(postsTable),
+  friends: table.belongsToMany(table),
+};
+
+table.setRelations(relations)
+
+export { table as usersTable };
