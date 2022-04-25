@@ -1,7 +1,7 @@
 import { ID, Row } from "../types";
 import { Relation } from "./relation";
 
-export class BelongsTo<Parent extends Row, Child extends Row> extends Relation<Parent, Child> {
+export class BelongsTo<Parent extends Row, Child extends Row, R extends string> extends Relation<Parent, Child, R, Child> {
   public load(parentForeignIds: ID[]): Promise<Child[]> {
     return this.queryFor(parentForeignIds);
   }
@@ -10,13 +10,13 @@ export class BelongsTo<Parent extends Row, Child extends Row> extends Relation<P
     return this.childTable.query().whereIn(this.childTable.primaryKey, parentForeignIds);
   }
 
-  public mapChildrenToParents(parents: Parent[], children: Child[], relationName: keyof Parent): void {
+  public mapChildrenToParents(parents: Parent[], children: Child[]): void {
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {
       const parentPK = parent[this.parentTable.primaryKey] as ID;
       const child = childDictionary[parentPK];
-      this.setRelation(relationName, parent, child || null);
+      this.setRelation(parent, child || null);
     }
   }
 

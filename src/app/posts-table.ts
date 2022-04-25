@@ -1,3 +1,4 @@
+import { belongsTo } from "../lib/relations";
 import { Table } from "../lib/table/table";
 import { usersTable } from "./users-table";
 
@@ -8,12 +9,14 @@ export interface Post {
   user_id: number;
 }
 
-export const table = new Table<Post>('posts', 'post', 'id');
+export const postsTable = new Table<Post>('posts', 'post', 'id');
 
 const relations = {
-  user: table.belongsTo(usersTable),
+  user: belongsTo(postsTable, usersTable, 'user'),
 };
 
-table.setRelations(relations);
+const schema = { table: postsTable, relations };
 
-export { table as postsTable };
+const posts: Post[] = [];
+
+const populatedPosts = schema.relations.user.populate(posts);

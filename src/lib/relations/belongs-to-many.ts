@@ -1,7 +1,7 @@
 import { ID, Row } from "../types";
 import { Relation } from "./relation";
 
-export class BelongsToMany<Parent extends Row, Child extends Row> extends Relation<Parent, Child> {
+export class BelongsToMany<Parent extends Row, Child extends Row, R extends string> extends Relation<Parent, Child, R, Child[]> {
   public load(parentIds: ID[]): Promise<Child[]> {
     return this.queryFor(parentIds);
   }
@@ -19,13 +19,13 @@ export class BelongsToMany<Parent extends Row, Child extends Row> extends Relati
       .whereIn(`${pivotTable}.${this.getParentForeignKey()}`, parentIds);
   }
 
-  public mapChildrenToParents(parents: Parent[], children: Child[], relationName: keyof Parent): void {
+  public mapChildrenToParents(parents: Parent[], children: Child[]): void {
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {
       const parentPK = parent[this.parentTable.primaryKey] as ID;
       const childrenOfParent = childDictionary[parentPK];
-      this.setRelation(relationName, parent, childrenOfParent || []);
+      this.setRelation(parent, childrenOfParent || []);
     }
   }
 

@@ -1,14 +1,14 @@
 import { ID, Row } from "../types";
 import { HasOneOrMany } from "./has-one-or-many";
 
-export class HasMany<Parent extends Row, Child extends Row> extends HasOneOrMany<Parent, Child> {
-  public mapChildrenToParents(parents: Parent[], children: Child[], relationName: keyof Parent): void {
+export class HasMany<Parent extends Row, Child extends Row, R extends string> extends HasOneOrMany<Parent, Child, R, Child[]> {
+  public mapChildrenToParents(parents: Parent[], children: Child[]): void {
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {
       const parentPK = parent[this.parentTable.primaryKey] as ID;
       const childrenOfParent = childDictionary[parentPK];
-      this.setRelation(relationName, parent, childrenOfParent || []);
+      this.setRelation(parent, childrenOfParent || []);
     }
   }
 

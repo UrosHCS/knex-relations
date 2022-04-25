@@ -1,7 +1,7 @@
 import { ID, Row } from "../types";
 import { Relation } from "./relation";
 
-export abstract class HasOneOrMany<Parent extends Row, Child extends Row> extends Relation<Parent, Child> {
+export abstract class HasOneOrMany<Parent extends Row, Child extends Row, R extends string, Population extends Child | Child[]> extends Relation<Parent, Child, R, Population> {
   public load(parentIds: ID[]): Promise<Child[]> {
     return this.queryFor(parentIds);
   }

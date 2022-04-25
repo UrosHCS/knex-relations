@@ -2,10 +2,11 @@ import { Knex } from "knex";
 import { Table } from "../table/table";
 import { ID, Row } from "../types";
 
-export abstract class Relation<Parent extends Row, Child extends Row> {
+export abstract class Relation<Parent extends Row, Child extends Row, R extends string, Population extends Child | Child[]> {
   constructor(
     protected parentTable: Table<Parent>,
     protected childTable: Table<Child>,
+    protected relationName: R,
   ) {}
 
   /**
@@ -24,26 +25,30 @@ export abstract class Relation<Parent extends Row, Child extends Row> {
   /**
    * Assign the given children to the given parents, where the key will be the relationName.
    */
-  abstract mapChildrenToParents(parents: Parent[], children: Child[], relationName: string): void;
+  abstract mapChildrenToParents(parents: Parent[], children: Child[]): void;
 
   /**
    * Load children and assign them to the given parents.
    */
-  async populate<C = unknown, R extends string = never>(parents: Parent[], relationName: R): Promise<Array<Parent & { [key in R]: C }>> {
+  async populate(parents: Parent[]): Promise<Array<Parent & { [key in R]: Population}>> {
     const key = this.getParentRelationKey();
   
     const ids = parents.map(parent => parent[key]);
 
     const children = await this.load(ids as ID[]);
 
-    this.mapChildrenToParents(parents, children, relationName);
+    this.mapChildrenToParents(parents, children);
 
     return parents;
   }
 
+  /**
+   * Get column name in the parent table that points to the child table.
+   */
   protected abstract getParentRelationKey(): string;
 
-  protected setRelation(relationName: keyof Parent, parent: Parent, children: unknown): void {
-    parent[relationName] = children as Parent[keyof Parent];
+  protected setRelation(parent: Parent, children: unknown): void {
+    // @ts-expect-error
+    parent[this.relationName] = children;
   }
 }

@@ -1,3 +1,4 @@
+import { belongsToMany, hasMany } from "../lib/relations";
 import { Table } from "../lib/table/table";
 import { Post, postsTable } from "./posts-table";
 
@@ -7,13 +8,15 @@ export interface User {
   name: string;
 }
 
-export const table = new Table<User>('users', 'user', 'id');
+export const usersTable = new Table<User>('users', 'user', 'id');
 
 const relations = {
-  posts: table.hasMany(postsTable),
-  friends: table.belongsToMany(table),
+  posts: hasMany(usersTable, postsTable, 'posts'),
+  friends: belongsToMany(usersTable, usersTable, 'friends'),
 };
 
-table.setRelations(relations)
+const schema = { table: usersTable, relations };
 
-export { table as usersTable };
+const users: User[] = [];
+
+const populatedUsers = schema.relations.friends.populate(users);
