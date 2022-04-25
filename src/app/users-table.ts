@@ -1,6 +1,7 @@
 import { belongsToMany, hasMany } from "../lib/relations";
+import { Schema } from "../lib/table/schema";
 import { Table } from "../lib/table/table";
-import { Post, postsTable } from "./posts-table";
+import { postsTable } from "./posts-table";
 
 export interface User {
   id: number;
@@ -10,13 +11,15 @@ export interface User {
 
 export const usersTable = new Table<User>('users', 'user', 'id');
 
-const relations = {
+const usersSchema = new Schema(usersTable, {
   posts: hasMany(usersTable, postsTable, 'posts'),
   friends: belongsToMany(usersTable, usersTable, 'friends'),
-};
-
-const schema = { table: usersTable, relations };
+});
 
 const users: User[] = [];
 
-const populatedUsers = schema.relations.friends.populate(users);
+(async () => {
+  const populatedUsers = await usersSchema.relations.friends.populate(users);
+
+  const populatedUsers2 = usersSchema.loadRelation(users, 'friends');
+})();
