@@ -1,7 +1,7 @@
 import { ID, Row } from "../types";
 import { Relation } from "./relation";
 
-export class BelongsToMany<Parent extends Row, Child extends Row, R extends string> extends Relation<Parent, Child, R, Child[]> {
+export class BelongsToMany<Parent extends Row<keyof Parent>, Child extends Row<keyof Child>, R extends string> extends Relation<Parent, Child, R, Child[]> {
   public queryFor(parentIds: ID[]) {
     const pivotTable = this.getPivotTableName();
 
@@ -19,7 +19,7 @@ export class BelongsToMany<Parent extends Row, Child extends Row, R extends stri
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {
-      const parentPK = parent[this.parentTable.primaryKey] as ID;
+      const parentPK = parent[this.parentTable.primaryKey];
       const childrenOfParent = childDictionary[parentPK];
       this.setRelation(parent, childrenOfParent || []);
     }
@@ -29,7 +29,7 @@ export class BelongsToMany<Parent extends Row, Child extends Row, R extends stri
     const foreignKey = this.getParentForeignKey();
 
     return children.reduce<Record<string, Child[]>>((dictionary, child) => {
-      const foreignValue = child[foreignKey] as string;
+      const foreignValue = child[foreignKey];
       if(!dictionary[foreignValue]) {
         dictionary[foreignValue] = [];
       }
@@ -46,14 +46,14 @@ export class BelongsToMany<Parent extends Row, Child extends Row, R extends stri
    * Get column name in pivot table that points to the parent table.
    */
   private getParentForeignKey() {
-    return `${this.parentTable.singular}_id`;
+    return `${this.parentTable.singular}_id` as keyof Parent;
   }
 
   /**
    * Get column name in pivot table that points to the child table.
    */
-   private getChildForeignKey(): string {
-    return `${this.childTable.singular}_id`;
+   private getChildForeignKey() {
+    return `${this.childTable.singular}_id` as keyof Child;
   }
 
   /**

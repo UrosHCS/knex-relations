@@ -1,24 +1,23 @@
-import knex, { Knex } from "knex";
 import { Relation } from "../relations/relation";
 import { Row } from "../types";
 import { Table } from "./table";
 
-export type RelationsMap<Parent> = Record<string, Relation<Parent, any, string, any>>;
+export type RelationsMap<Parent, T extends string | number | symbol> = Record<T, Relation<Parent, any, string, any>>;
 
-export class TableRelations<M extends Row, R extends RelationsMap<M>> {
+export class TableRelations<Model extends Row<keyof Model>, R extends RelationsMap<Model, keyof R> = {}> {
   constructor(
-    public readonly table: Table<M>,
+    public readonly table: Table<Model>,
     public readonly map: R,
   ) {}
 
-  async populateMany<N extends keyof R>(results: M[], relationNames: N[]): Promise<void> {
+  async populateMany(results: Model[], relationNames: string[]): Promise<void> {
     await Promise.all(relationNames.map(relationName => {
       this.populate(results, relationName);
     }));
   }
 
-  getRelation<N extends keyof R>(relationName: N): R[N] {
-    const relation =  this.map[relationName];
+  getRelation(relationName: string): R[keyof R] {
+    const relation = this.map[relationName as keyof R];
 
     if (!relation) {
       throw new Error(`Relation "${relationName}" does not exist.`);
@@ -27,13 +26,13 @@ export class TableRelations<M extends Row, R extends RelationsMap<M>> {
     return relation;
   }
 
-  populate<N extends keyof R>(results: M[], relationName: N): ReturnType<R[N]['populate']> {
-    const relation = this.getRelation<N>(relationName);
+  populate(results: Model[], relationName: string): ReturnType<R[keyof R]['populate']> {
+    const relation = this.getRelation(relationName);
     // @ts-expect-error
     return relation.populate(results);
   }
 
-  async populateNested<T extends M[]>(results: M[], nestedRelationNames: string): Promise<T> {
+  async populateNested<T extends Model[]>(results: Model[], nestedRelationNames: string): Promise<T> {
     const relationNames = nestedRelationNames.split('.');
 
     // relationNames.length should never be zero because .split()
@@ -42,7 +41,7 @@ export class TableRelations<M extends Row, R extends RelationsMap<M>> {
     return this.doLoadNested(results, relationNames);
   }
 
-  private async doLoadNested<T extends M[]>(results: M[], nestedRelationNames: string[]): Promise<T> {
+  private async doLoadNested<T extends Model[]>(results: Model[], nestedRelationNames: string[]): Promise<T> {
     if (nestedRelationNames.length === 0) {
       return results as T;
     }
@@ -60,10 +59,6 @@ export class TableRelations<M extends Row, R extends RelationsMap<M>> {
     const relation = this.getRelation(relationName);
 
     const children = await relation.loadChildren(results);
-
-    if (!relation.childTable.relations) {
-      throw new Error(`Can't load "${relationName}" relation, relations not defined on ${relation.childTable.name} table.`);
-    }
 
     relation.childTable.relations.doLoadNested(children, nestedRelationNames.slice(1));
 

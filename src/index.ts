@@ -32,7 +32,7 @@ async function run() {
 
     console.log(users);
 
-    const usersWithPosts = await usersTable.loadRelation<Post, 'posts'>(users, 'posts');
+    const usersWithPosts = await usersTable.relations?.populate(users, 'posts');
     return usersWithPosts;
 
   } catch (err) {
