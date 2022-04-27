@@ -4,7 +4,7 @@ import { Table } from "./table";
 
 export type RelationsMap<Parent, T extends string | number | symbol> = Record<T, Relation<Parent, any, string, any>>;
 
-export class TableRelations<Model extends Row<keyof Model>, R extends RelationsMap<Model, keyof R> = {}> {
+export class TableRelations<Model extends Row<keyof Model>, R extends RelationsMap<Model, keyof R>> {
   constructor(
     public readonly table: Table<Model>,
     public readonly map: R,

@@ -2,9 +2,9 @@ import knex from "knex";
 import { Row } from "../types";
 import { RelationsMap, TableRelations } from "./table-relations";
 
-export class Table<Model extends Row<string>, R extends RelationsMap<Model, keyof R> = {}> {
+export class Table<Model extends Row<string>, R extends RelationsMap<Model, keyof R> = any> {
   // Initialized so that it can't be undefined.
-  relations: TableRelations<Model, R> = new TableRelations(this, {} as R);
+  relations: TableRelations<Model, R> = new TableRelations<Model, any>(this, {});
 
   constructor(
     public readonly name: string,

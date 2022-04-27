@@ -31,7 +31,7 @@ export class BelongsTo<Parent extends Row<keyof Parent>, Child extends Row<keyof
   /**
    * Get column name in the parent table that points to the child table.
    */
-  protected getParentRelationKey(): keyof Parent {
+  protected getParentRelationKey() {
     return `${this.childTable.singular}_id` as keyof Parent;
   }
 }
