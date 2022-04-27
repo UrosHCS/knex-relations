@@ -1,7 +1,9 @@
 import { belongsToMany, hasMany } from "../lib/relations";
-import { Schema } from "../lib/table/schema";
+import { TableRelations } from "../lib/table/table-relations";
 import { Table } from "../lib/table/table";
-import { postsTable } from "./posts-table";
+import { Post, postsTable } from "./posts-table";
+import { HasMany } from "../lib/relations/has-many";
+import { BelongsToMany } from "../lib/relations/belongs-to-many";
 
 export interface User {
   id: number;
@@ -9,17 +11,25 @@ export interface User {
   name: string;
 }
 
-export const usersTable = new Table<User>('users', 'user', 'id');
+interface UserRelations {
+  posts: HasMany<User, Post, 'posts'>;
+  friends: BelongsToMany<User, User, 'friends'>;
+}
 
-const usersSchema = new Schema(usersTable, {
+export const usersTable = new Table<User, UserRelations>('users', 'user', 'id');
+
+const relations = new TableRelations(usersTable, {
   posts: hasMany(usersTable, postsTable, 'posts'),
   friends: belongsToMany(usersTable, usersTable, 'friends'),
 });
 
+usersTable.setRelations(relations);
+
 const users: User[] = [];
 
 (async () => {
-  const populatedUsers = await usersSchema.relations.friends.populate(users);
+  const populatedUsers = await relations.map.friends.populate(users);
 
-  const populatedUsers2 = usersSchema.loadRelation(users, 'friends');
+  const populatedUsers2 = relations.populate(users, 'friends');
+  const nestedUsers = relations.populateNested(users, 'friends.friends.posts');
 })();

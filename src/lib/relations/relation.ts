@@ -4,9 +4,9 @@ import { ID, Row } from "../types";
 
 export abstract class Relation<Parent extends Row, Child extends Row, R extends string, Population extends Child | Child[]> {
   constructor(
-    protected parentTable: Table<Parent>,
-    protected childTable: Table<Child>,
-    protected relationName: R,
+    public readonly parentTable: Table<Parent>,
+    public readonly childTable: Table<Child>,
+    public readonly relationName: R,
   ) {}
 
   /**
@@ -15,8 +15,9 @@ export abstract class Relation<Parent extends Row, Child extends Row, R extends 
    * and belongs-to-many relations, and parent foreign key ids
    * in a belongs-to relation.
    */
-  abstract load(ids: ID[]): Promise<Child[]>;
-  
+   public load(ids: ID[]): Promise<Child[]> {
+    return this.queryFor(ids);
+  }
   /**
    * Return a query builder that can be used to query for child models.
    */
@@ -27,17 +28,19 @@ export abstract class Relation<Parent extends Row, Child extends Row, R extends 
    */
   abstract mapChildrenToParents(parents: Parent[], children: Child[]): void;
 
-  /**
-   * Load children and assign them to the given parents.
-   */
-  async populate(parents: Parent[]): Promise<Array<Parent & { [key in R]: Population}>> {
+  loadChildren(parents: Parent[]): Promise<Child[]> {
     const key = this.getParentRelationKey();
   
     const ids = parents.map(parent => parent[key]);
 
-    const children = await this.load(ids as ID[]);
+    return this.load(ids as ID[]);
+  }
 
-    this.mapChildrenToParents(parents, children);
+  /**
+   * Load children and assign them to the given parents.
+   */
+  async populate(parents: Parent[]): Promise<Array<Parent & { [key in R]: Population}>> {
+    this.mapChildrenToParents(parents, await this.loadChildren(parents));
 
     return parents;
   }

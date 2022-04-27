@@ -2,10 +2,6 @@ import { ID, Row } from "../types";
 import { Relation } from "./relation";
 
 export class BelongsTo<Parent extends Row, Child extends Row, R extends string> extends Relation<Parent, Child, R, Child> {
-  public load(parentForeignIds: ID[]): Promise<Child[]> {
-    return this.queryFor(parentForeignIds);
-  }
-
   public queryFor(parentForeignIds: ID[]) {
     return this.childTable.query().whereIn(this.childTable.primaryKey, parentForeignIds);
   }

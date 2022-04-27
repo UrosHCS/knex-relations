@@ -2,10 +2,6 @@ import { ID, Row } from "../types";
 import { Relation } from "./relation";
 
 export class BelongsToMany<Parent extends Row, Child extends Row, R extends string> extends Relation<Parent, Child, R, Child[]> {
-  public load(parentIds: ID[]): Promise<Child[]> {
-    return this.queryFor(parentIds);
-  }
-
   public queryFor(parentIds: ID[]) {
     const pivotTable = this.getPivotTableName();
 
