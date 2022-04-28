@@ -11,10 +11,10 @@ export interface User {
   name: string;
 }
 
-interface UserRelations {
+type UserRelations = {
   posts: HasMany<User, Post, 'posts'>;
   friends: BelongsToMany<User, User, 'friends'>;
-}
+};
 
 export const usersTable = new Table<User, UserRelations>('users', 'user', 'id');
 

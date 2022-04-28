@@ -2,7 +2,7 @@ import { Knex } from "knex";
 import { Table } from "../table/table";
 import { ID, Row } from "../types";
 
-export abstract class Relation<Parent extends Row<keyof Parent>, Child extends Row<keyof Child>, R extends string, Population extends Child | Child[]> {
+export abstract class Relation<Parent extends Row, Child extends Row, R extends string, Population extends Child | Child[]> {
   constructor(
     public readonly parentTable: Table<Parent>,
     public readonly childTable: Table<Child>,
@@ -41,8 +41,6 @@ export abstract class Relation<Parent extends Row<keyof Parent>, Child extends R
    */
   async populate(parents: Parent[]): Promise<Array<Parent & { [key in R]: Population }>> {
     this.mapChildrenToParents(parents, await this.loadChildren(parents));
-
-    // @ts-expect-error
     return parents;
   }
 

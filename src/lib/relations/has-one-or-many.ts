@@ -1,7 +1,7 @@
 import { ID, Row } from "../types";
 import { Relation } from "./relation";
 
-export abstract class HasOneOrMany<Parent extends Row<keyof Parent>, Child extends Row<keyof Child>, R extends string, Population extends Child | Child[]> extends Relation<Parent, Child, R, Population> {
+export abstract class HasOneOrMany<Parent extends Row, Child extends Row, R extends string, Population extends Child | Child[]> extends Relation<Parent, Child, R, Population> {
   public queryFor(parentIds: ID[]) {
     // TODO: remove " as string"
     return this.childTable.query().whereIn(this.getForeignKeyName() as string, parentIds);

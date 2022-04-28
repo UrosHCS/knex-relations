@@ -11,9 +11,9 @@ export interface Post {
   user_id: number;
 }
 
-interface PostRelations {
+type PostRelations = {
   user: BelongsTo<Post, User, 'user'>;
-}
+};
 
 export const postsTable = new Table<Post, PostRelations>('posts', 'post', 'id');
 
