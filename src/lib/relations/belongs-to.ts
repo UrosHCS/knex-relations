@@ -1,13 +1,13 @@
 import { ID, Row } from "../types";
 import { Relation } from "./relation";
 
-export class BelongsTo<Parent extends Row, Child extends Row, R extends string> extends Relation<Parent, Child, R, Child> {
-  public queryFor(parentForeignIds: ID[]) {
+export class BelongsTo<Parent extends Row, Child extends Row, N extends string> extends Relation<Parent, Child, N, Child> {
+  queryFor(parentForeignIds: ID[]) {
     // TODO: remove " as string"
     return this.childTable.query().whereIn(this.childTable.primaryKey as string, parentForeignIds);
   }
 
-  public mapChildrenToParents(parents: Parent[], children: Child[]): void {
+  mapChildrenToParents(parents: Parent[], children: Child[]): void {
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {

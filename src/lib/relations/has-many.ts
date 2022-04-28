@@ -1,8 +1,8 @@
 import { ID, Row } from "../types";
 import { HasOneOrMany } from "./has-one-or-many";
 
-export class HasMany<Parent extends Row, Child extends Row, R extends string> extends HasOneOrMany<Parent, Child, R, Child[]> {
-  public mapChildrenToParents(parents: Parent[], children: Child[]): void {
+export class HasMany<Parent extends Row, Child extends Row, N extends string> extends HasOneOrMany<Parent, Child, N, Child[]> {
+  mapChildrenToParents(parents: Parent[], children: Child[]): void {
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {

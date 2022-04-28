@@ -1,5 +1,4 @@
 import { belongsTo } from "../lib/relations";
-import { TableRelations } from "../lib/table/table-relations";
 import { Table } from "../lib/table/table";
 import { User, usersTable } from "./users-table";
 import { BelongsTo } from "../lib/relations/belongs-to";
@@ -11,21 +10,17 @@ export interface Post {
   user_id: number;
 }
 
-type PostRelations = {
+type Relations = {
   user: BelongsTo<Post, User, 'user'>;
 };
 
-export const postsTable = new Table<Post, PostRelations>('posts', 'post', 'id');
-
-const relations = new TableRelations(postsTable, {
+export const postsTable: Table<Post, Relations> = new Table('posts', 'post', 'id', () => ({
   user: belongsTo(postsTable, usersTable, 'user'),
-});
-
-postsTable.setRelations(relations);
+}));
 
 const posts: Post[] = [];
 
 (async () => {
-  const populatedPosts = relations.map.user.populate(posts);
-  const populatedPosts2 = relations.populate(posts, 'user');
-})
+  const populatedPosts = postsTable.relations.user.populate(posts);
+  const populatedPosts2 = postsTable.populate(posts, 'user');
+})();

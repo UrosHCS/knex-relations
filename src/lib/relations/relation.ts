@@ -2,11 +2,11 @@ import { Knex } from "knex";
 import { Table } from "../table/table";
 import { ID, Row } from "../types";
 
-export abstract class Relation<Parent extends Row, Child extends Row, R extends string, Population extends Child | Child[]> {
+export abstract class Relation<Parent extends Row, Child extends Row, N extends string, Population extends Child | Child[]> {
   constructor(
-    public readonly parentTable: Table<Parent>,
-    public readonly childTable: Table<Child>,
-    public readonly relationName: R,
+    readonly parentTable: Table<Parent>,
+    readonly childTable: Table<Child>,
+    readonly relationName: N,
   ) {}
 
   /**
@@ -15,9 +15,10 @@ export abstract class Relation<Parent extends Row, Child extends Row, R extends 
    * and belongs-to-many relations, and parent foreign key ids
    * in a belongs-to relation.
    */
-   public load(ids: ID[]): Promise<Child[]> {
+  loadForIds(ids: ID[]): Promise<Child[]> {
     return this.queryFor(ids);
   }
+
   /**
    * Return a query builder that can be used to query for child models.
    */
@@ -33,14 +34,17 @@ export abstract class Relation<Parent extends Row, Child extends Row, R extends 
   
     const ids = parents.map(parent => parent[key]);
 
-    return this.load(ids);
+    return this.loadForIds(ids);
   }
 
   /**
    * Load children and assign them to the given parents.
    */
-  async populate(parents: Parent[]): Promise<Array<Parent & { [key in R]: Population }>> {
-    this.mapChildrenToParents(parents, await this.loadChildren(parents));
+  async populate(parents: Parent[]): Promise<Array<Parent & { [key in N]: Population }>> {
+    const children = await this.loadChildren(parents);
+
+    this.mapChildrenToParents(parents, children);
+
     return parents;
   }
 
