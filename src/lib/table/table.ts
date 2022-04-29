@@ -1,8 +1,13 @@
-import knex from "knex";
+import { DB } from ".";
 import { Relation } from "../relations/relation";
 import { Row } from "../types";
 
+/**
+ * Generic relations map.
+ */
 export type RelationsMap<Parent> = Record<string, Relation<Parent, any, string, any>>;
+
+export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
 
 export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>> {
   readonly relations: R;
@@ -10,14 +15,15 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   constructor(
     readonly name: string,
     readonly singular: string,
-    readonly primaryKey: keyof Model = 'id',
-    relationBuilder?: (table: Table<Model, R>) => R,
+    readonly primaryKey: keyof Model,
+    readonly db: DB,
+    relationBuilder?: RelationBuilder<Model, R>,
   ) {
     this.relations = relationBuilder ? relationBuilder(this) : {} as R;
   }
 
   query() {
-    return knex<Model>(this.name);
+    return this.db.from<Model>(this.name);
   }
 
   async populateMany(results: Model[], relationNames: string[]): Promise<void> {

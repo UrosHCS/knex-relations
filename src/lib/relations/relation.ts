@@ -1,6 +1,7 @@
 import { Knex } from "knex";
 import { Table } from "../table/table";
-import { ID, Row } from "../types";
+import { Row } from "../types";
+import { ID } from ".";
 
 export abstract class Relation<Parent extends Row, Child extends Row, N extends string, Population extends Child | Child[]> {
   constructor(

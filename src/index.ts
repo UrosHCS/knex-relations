@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import knex from 'knex';
-import { Post, postsTable } from './app/posts-table';
-import { usersTable } from './app/users-table';
+import { Post, postsTable } from './app/post/posts-table';
+import { usersTable } from './app/user/users-table';
 
 const config: Knex.Config = {
   client: 'better-sqlite3',

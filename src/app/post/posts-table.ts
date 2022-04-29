@@ -1,7 +1,7 @@
-import { belongsTo } from "../lib/relations";
-import { Table } from "../lib/table/table";
-import { User, usersTable } from "./users-table";
-import { BelongsTo } from "../lib/relations/belongs-to";
+import { belongsTo } from "../../lib/relations";
+import { User, usersTable } from "../user/users-table";
+import { BelongsTo } from "../../lib/relations/belongs-to";
+import { createTable, Table } from "../../lib/table";
 
 export interface Post {
   id: number;
@@ -14,7 +14,7 @@ type Relations = {
   user: BelongsTo<Post, User, 'user'>;
 };
 
-export const postsTable: Table<Post, Relations> = new Table('posts', 'post', 'id', () => ({
+export const postsTable: Table<Post, Relations> = createTable('posts', 'post', () => ({
   user: belongsTo(postsTable, usersTable, 'user'),
 }));
 

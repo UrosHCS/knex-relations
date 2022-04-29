@@ -1,5 +1,6 @@
-import { ID, Row } from "../types";
+import { Row } from "../types";
 import { Relation } from "./relation";
+import { ID } from ".";
 
 export class BelongsTo<Parent extends Row, Child extends Row, N extends string> extends Relation<Parent, Child, N, Child> {
   queryFor(parentForeignIds: ID[]) {

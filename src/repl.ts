@@ -1,5 +1,5 @@
-import { postsTable } from './app/posts-table';
-import { usersTable } from './app/users-table';
+import { postsTable } from './app/post/posts-table';
+import { usersTable } from './app/user/users-table';
 import { runRepl } from './lib/repl/repl';
 
 runRepl({
