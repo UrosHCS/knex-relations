@@ -1,24 +1,25 @@
 import knex, { Knex } from "knex";
+import { DB } from ".";
 import { Row } from "../types";
 
 export type FullQB<Model extends Row, QB extends QueryBuilder<Model>> = QB & Knex.QueryBuilder<Model, any>;
 
-export type QBConstructor<Model extends Row, QB extends QueryBuilder<Model>> = new (table: string) => QB;
+export type QBConstructor<Model extends Row, QB extends QueryBuilder<Model>> = new (db: DB, table: string) => QB;
 
-export function knexQueryBuilder<Model extends Row>(table: string) {
-  return knex<Model>(table).queryBuilder();
+export function knexQueryBuilder<Model extends Row>(db: DB, table: string) {
+  return db<Model>(table);
 }
 
 export class QueryBuilder<Model extends Row> {
   qb: Knex.QueryBuilder<Model, any>;
 
-  constructor(table: string) {
-    this.qb = knexQueryBuilder(table);
+  constructor(db: DB, table: string) {
+    this.qb = knexQueryBuilder(db, table);
   }
 }
 
-export function createQB<Model extends Row, QB extends QueryBuilder<Model>>(table: string, Constructor: QBConstructor<Model, QB>): QB & Knex.QueryBuilder<Model> {
-  const qb = new Constructor(table);
+export function createQB<Model extends Row, QB extends QueryBuilder<Model>>(table: string, db: DB, Constructor: QBConstructor<Model, QB>): QB & Knex.QueryBuilder<Model> {
+  const qb = new Constructor(db, table);
 
   const proxy = new Proxy(qb, {
     get(qb, prop, receiver) {

@@ -1,3 +1,4 @@
+import { DB } from ".";
 import { Relation } from "../relations/relation";
 import { Row } from "../types";
 import { createQB, knexQueryBuilder, QBConstructor, QueryBuilder } from "./query-builder";
@@ -9,13 +10,14 @@ export type RelationsMap<Parent> = Record<string, Relation<Parent, any, string, 
 
 export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>, QB extends QueryBuilder<Model>> = (table: Table<Model, R, QB>) => R;
 
-export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>, QB extends QueryBuilder<Model> = never> {
+export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>, QB extends QueryBuilder<Model> = QueryBuilder<Model>> {
   readonly relations: R;
 
   constructor(
     readonly name: string,
     readonly singular: string,
     readonly primaryKey: keyof Model,
+    readonly db: DB,
     readonly QBClass?: QBConstructor<Model, QB>,
     relationBuilder?: RelationBuilder<Model, R, QB>,
   ) {
@@ -23,7 +25,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   }
 
   query() {
-    return this.QBClass ? createQB<Model, QB>(this.name, this.QBClass) : knexQueryBuilder<Model>(this.name);
+    return this.QBClass ? createQB<Model, QB>(this.name, this.db, this.QBClass) : knexQueryBuilder<Model>(this.db, this.name);
   }
 
   async populateMany(results: Model[], relationNames: string[]): Promise<void> {

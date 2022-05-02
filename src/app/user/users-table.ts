@@ -1,7 +1,6 @@
 import { createTable, Table } from "../../lib/table";
 import { belongsToMany, BelongsToMany, hasMany, HasMany } from "../../lib/relations";
 import { Post, postsTable } from "../post/posts-table";
-import { connect } from "../../core/db";
 import { UsersQueryBuilder } from "./users-query-builder";
 
 export interface User {
@@ -21,7 +20,7 @@ type Relations = {
   friends: BelongsToMany<User, User, 'friends'>;
 };
 
-export const usersTable: Table<User, Relations> = createTable('users', 'user', () => ({
+export const usersTable: Table<User, Relations, UsersQueryBuilder> = createTable('users', 'user', () => ({
   posts: hasMany(usersTable, postsTable, 'posts'),
   friends: belongsToMany(usersTable, usersTable, 'friends'),
 }));
