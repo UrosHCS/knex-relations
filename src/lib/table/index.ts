@@ -18,3 +18,4 @@ export function setDatabase(db: DB): void {
 
 export * from './create-table';
 export * from './table';
+export * from './repository';
