@@ -1,33 +1,53 @@
-import knex, { Knex } from "knex";
-import { DB } from ".";
+import { Knex } from "knex";
+import { KnexQB, RelationsMap, Table } from ".";
 import { Row } from "../types";
 
-export type FullQB<Model extends Row, QB extends QueryBuilder<Model>> = QB & Knex.QueryBuilder<Model, any>;
+export type FullQB<Model extends Row, QB> = QB & Knex.QueryBuilder<Model, any>;
 
-export type QBConstructor<Model extends Row, QB extends QueryBuilder<Model>> = new (db: DB, table: string) => QB;
+export type QBConstructor<Model extends Row, R extends RelationsMap<Model>, QB extends QueryBuilder<Model, R>> = new () => QB;
 
-export function knexQueryBuilder<Model extends Row>(db: DB, table: string) {
-  return db<Model>(table);
-}
+export abstract class QueryBuilder<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>> {
+  base: KnexQB<Model>;
 
-export class QueryBuilder<Model extends Row> {
-  qb: Knex.QueryBuilder<Model, any>;
+  constructor(readonly table: Table<Model, R>) {
+    this.base = this.table.query();
+  }
 
-  constructor(db: DB, table: string) {
-    this.qb = knexQueryBuilder(db, table);
+  relation(relationName: keyof R) {
+    return this.table.getRelation(relationName);
   }
 }
 
-export function createQB<Model extends Row, QB extends QueryBuilder<Model>>(table: string, db: DB, Constructor: QBConstructor<Model, QB>): QB & Knex.QueryBuilder<Model> {
-  const qb = new Constructor(db, table);
+export function createQB<Model extends Row, R extends RelationsMap<Model>, QB extends QueryBuilder<Model, R>>(Constructor: QBConstructor<Model, R, QB>): FullQB<Model, QB> {
+  const qb = new Constructor();
 
-  const proxy = new Proxy(qb, {
+  const proxy: QB = new Proxy(qb, {
     get(qb, prop, receiver) {
+      // If the property exists in the query builder, just return it.
       if (prop in qb) {
         return Reflect.get(qb, prop, receiver);
       }
 
-      return Reflect.get(qb.qb, prop, receiver);
+      const knexFn = Reflect.get(qb.base, prop, receiver);
+
+      // If the property is a function, we need to proxy it also.
+      if (typeof knexFn === 'function') {
+        return new Proxy(knexFn, {
+          apply(knexFn, thisArg, argumentsList) {
+            const returnValue = Reflect.apply(knexFn, thisArg, argumentsList);
+            // If the knex function returns the knex query builder instance (this), we will return
+            // the wrapper query builder because we can assume that we want to chain methods.
+            if (returnValue === qb.base) {
+              return proxy;
+            }
+
+            return returnValue;
+          }
+        });
+      }
+
+      // Here we know that the property is not a function, so we can just return it.
+      return knexFn;
     }
   });
 

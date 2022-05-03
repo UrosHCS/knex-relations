@@ -1,7 +1,6 @@
 import { createTable, Table } from "../../lib/table";
 import { belongsToMany, BelongsToMany, hasMany, HasMany } from "../../lib/relations";
 import { Post, postsTable } from "../post/posts-table";
-import { UsersQueryBuilder } from "./users-query-builder";
 
 export interface User {
   id: number;
@@ -9,30 +8,12 @@ export interface User {
   name: string;
 }
 
-const user: User = {
-  id: 5, 
-  email: 'bebolino@gmail.com',
-  name: 'Beba',
-};
-
-type Relations = {
+export type UserRelations = {
   posts: HasMany<User, Post, 'posts'>;
   friends: BelongsToMany<User, User, 'friends'>;
 };
 
-export const usersTable: Table<User, Relations, UsersQueryBuilder> = createTable('users', 'user', () => ({
+export const usersTable: Table<User, UserRelations> = createTable('users', 'user', () => ({
   posts: hasMany(usersTable, postsTable, 'posts'),
   friends: belongsToMany(usersTable, usersTable, 'friends'),
 }));
-
-const users: User[] = [];
-
-const qb = usersTable.query();
-
-(async () => {
-  const populatedUsers = await usersTable.relations.friends.populate(users);
-
-  const populatedUsers2 = usersTable.populate(users, 'friends');
-  const psps = usersTable.populate(users, 'posts');
-  const nestedUsers = usersTable.populateNested(users, 'friends.friends.posts');
-})();

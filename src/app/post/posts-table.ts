@@ -10,17 +10,10 @@ export interface Post {
   user_id: number;
 }
 
-type Relations = {
+export type PostRelations = {
   user: BelongsTo<Post, User, 'user'>;
 };
 
-export const postsTable: Table<Post, Relations> = createTable('posts', 'post', () => ({
+export const postsTable: Table<Post, PostRelations> = createTable('posts', 'post', () => ({
   user: belongsTo(postsTable, usersTable, 'user'),
 }));
-
-const posts: Post[] = [];
-
-(async () => {
-  const populatedPosts = postsTable.relations.user.populate(posts);
-  const populatedPosts2 = postsTable.populate(posts, 'user');
-})();
