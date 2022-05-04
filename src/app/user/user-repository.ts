@@ -16,7 +16,7 @@ class UserRepository extends Repository<User> {
 
   async miniUsers() {
     const miniUsers = await this.query().select('id', 'email').where((qb) => {
-      qb.where('name', '=', 3);
+      qb.where({ name: 'John' });
     });
 
     return miniUsers;

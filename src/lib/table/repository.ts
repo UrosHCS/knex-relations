@@ -1,4 +1,5 @@
 import { Table } from ".";
+import { QueryBuilder } from "./query-builder";
 
 export abstract class Repository<TRecord> {
   abstract table: Table<TRecord, any>;
