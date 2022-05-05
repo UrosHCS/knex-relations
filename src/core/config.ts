@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 
-const knexConfig: Knex.Config = {
+const sqlite: Knex.Config = {
   client: 'better-sqlite3',
   // connection: 'file:memDb?mode=memory&cache=shared', 
   connection: {
@@ -11,11 +11,12 @@ const knexConfig: Knex.Config = {
     max: 1,
     destroyTimeoutMillis: 360000*1000, 
     idleTimeoutMillis: 360000*1000 
-  }
+  },
+  useNullAsDefault: true,
 };
 
 const db = {
-  knexConfig,
+  sqlite,
 };
 
 export const config = { db };

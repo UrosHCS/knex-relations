@@ -14,7 +14,6 @@ process.env.NODE_REPL_HISTORY = path.join(os.homedir(), '.node_repl_history');
 
 export interface Config {
   context?: (register: RegisterFunction) => Promise<void> | void;
-  boot?: () => Promise<void> | void;
   welcomeMessage?: string;
 };
 
@@ -29,10 +28,6 @@ export const runRepl = async (config: Config) => {
     replServer.context[key] = value;
     vars[key] = description;
   };
-
-  if (config.boot) {
-    await config.boot();
-  }
 
   if (config.context) {
     await config.context(register);

@@ -1,5 +1,5 @@
-import { createTable, Table } from "../../lib/table";
-import { belongsToMany, BelongsToMany, hasMany, HasMany } from "../../lib/relations";
+import { Table } from "../../lib/table";
+import { BelongsToMany, HasMany } from "../../lib/relations";
 import { Post, postsTable } from "../post/posts-table";
 
 export interface User {
@@ -13,7 +13,7 @@ export type UserRelations = {
   friends: BelongsToMany<User, User, 'friends'>;
 };
 
-export const usersTable: Table<User, UserRelations> = createTable('users', 'user', () => ({
-  posts: hasMany(usersTable, postsTable, 'posts'),
-  friends: belongsToMany(usersTable, usersTable, 'friends'),
+export const usersTable: Table<User, UserRelations> = new Table('users', 'user', () => ({
+  posts: new HasMany(usersTable, postsTable, 'posts'),
+  friends: new BelongsToMany(usersTable, usersTable, 'friends'),
 }));

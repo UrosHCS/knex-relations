@@ -8,7 +8,7 @@ export function connect() {
     return db;
   }
 
-  db = knex(config.db.knexConfig);
+  db = knex(config.db.sqlite);
 
   return db;
 }

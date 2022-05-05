@@ -1,6 +1,13 @@
-import { DB } from ".";
+import { DB, getDatabase } from ".";
 import { Relation } from "../relations/relation";
 import { Row } from "../types";
+
+export type TableConfig<Model> = {
+  // Table's primary key. Default is "id".
+  primaryKey?: keyof Model;
+  // Database connection or a function that returns it.
+  db?: DB | (() => DB);
+};
 
 /**
  * Generic relations map.
@@ -9,17 +16,35 @@ export type RelationsMap<Parent> = Record<string, Relation<Parent, any, string, 
 
 export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
 
+const DEFAULT_PRIMARY_KEY = 'id';
+
 export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>> {
   readonly relations: R;
+  readonly primaryKey: keyof Model;
+  readonly db: DB;
 
   constructor(
     readonly name: string,
     readonly singular: string,
-    readonly primaryKey: keyof Model,
-    readonly db: DB,
     relationBuilder?: RelationBuilder<Model, R>,
+    config?: TableConfig<Model>,
   ) {
     this.relations = relationBuilder ? relationBuilder(this) : {} as R;
+    this.primaryKey = config?.primaryKey ?? DEFAULT_PRIMARY_KEY;
+    this.db = this.resolveDb(config?.db);
+  }
+
+  private resolveDb<Model>(db: TableConfig<Model>['db']): DB {
+    if (!db) {
+      return getDatabase();
+    }
+
+    return this.dbIsFunction(db) ? db() : db;
+  }
+
+
+  private dbIsFunction<Model>(db: TableConfig<Model>['db']): db is (() => DB) {
+    return typeof db === 'function';
   }
 
   query() {

@@ -7,16 +7,16 @@
     "start": "node --loader ts-node/esm src/index.ts",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "repl": "node --loader ts-node/esm src/index.ts",
+    "repl": "node --loader ts-node/esm src/repl.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@vscode/sqlite3": "^5.0.8",
     "knex": "^1.0.5"
   },
   "devDependencies": {
+    "@vscode/sqlite3": "^5.0.8",
     "@types/node": "^17.0.24",
     "better-sqlite3": "^7.5.1",
     "ts-node": "^10.7.0",

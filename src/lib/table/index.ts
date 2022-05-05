@@ -17,6 +17,5 @@ export function setDatabase(db: DB): void {
   databaseInstance = db;
 }
 
-export * from './create-table';
 export * from './table';
 export * from './repository';

@@ -1,15 +1,13 @@
-import { postModule } from './app/post';
-import { userModule } from './app/user';
 import { boot } from './core';
 import { runRepl } from './lib/repl/repl';
 
 runRepl({
-  boot: () => {
-    boot();
-  },
-  context: (register) => {
-    register('user', userModule, 'user module');
-    register('post', postModule, 'post module');
+  context: async (register) => {
+    const app = await boot();
+
+    register('app', app, 'app');
+    register('user', app.userModule, 'user module');
+    register('post', app.postModule, 'post module');
   },
   welcomeMessage: 'Welcome to the repl!',
 });
