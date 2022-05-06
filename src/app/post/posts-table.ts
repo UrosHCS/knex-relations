@@ -12,6 +12,6 @@ export type PostRelations = {
   user: BelongsTo<Post, User, 'user'>;
 };
 
-export const postsTable: Table<Post, PostRelations> = new Table('posts', 'post', () => ({
+export const postsTable: Table<Post, PostRelations> = new Table('posts', 'post', postsTable => ({
   user: new BelongsTo(postsTable, usersTable, 'user'),
 }));

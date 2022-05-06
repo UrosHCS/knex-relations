@@ -5,5 +5,5 @@ import { usersTable } from "./users-table";
 export const userModule = {
   repo: userRepository,
   qb: () => new UserQueryBuilder(),
-  table: usersTable,
+  table: usersTable.init(),
 };

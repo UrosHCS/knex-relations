@@ -3,19 +3,21 @@ import { Knex } from 'knex';
 export type DB = Knex;
 export type KnexQB<Model> = Knex.QueryBuilder<Model>;
 
-let databaseInstance: DB | null = null;
+let db: DB;
 
 export function getDatabase(): DB {
-  if (!databaseInstance) {
+  if (!db) {
     throw new Error('Database not set. Use setDatabase function to set it (setDatabase(knex(config)).');
   }
 
-  return databaseInstance;
+  return db;
 }
 
-export function setDatabase(db: DB): void {
-  databaseInstance = db;
+export function setDatabase(database: DB): void {
+  db = database;
 }
+
+export { db };
 
 export * from './table';
 export * from './repository';

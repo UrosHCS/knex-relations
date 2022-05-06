@@ -8,7 +8,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "cli": "node dist/cli",
-    "repl": "npm run cli repl",
+    "repl": "node dist/cli repl",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

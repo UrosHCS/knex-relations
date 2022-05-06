@@ -12,8 +12,8 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {
-      const parentPK = parent[this.parentTable.primaryKey];
-      const child = childDictionary[parentPK];
+      const parentFK = parent[this.getParentRelationKey()];
+      const child = childDictionary[parentFK];
       this.setRelation(parent, child || null);
     }
   }

@@ -5,5 +5,5 @@ import { postsTable } from "./posts-table";
 export const postModule = {
   repo: postRepository,
   qb: () => new PostQueryBuilder(),
-  table: postsTable,
+  table: postsTable.init(),
 };

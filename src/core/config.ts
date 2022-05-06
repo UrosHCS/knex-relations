@@ -3,9 +3,8 @@ import { Knex } from "knex";
 const sqlite: Knex.Config = {
   client: 'better-sqlite3',
   connection: {
-    // filename: 'file:memDb?mode=memory&cache=shared',
-    filename: ':memory:',
-  }, 
+    filename: 'db/file:memDb?mode=memory&cache=shared',
+  },
   pool: {
     min: 1,
     max: 1,
@@ -14,10 +13,10 @@ const sqlite: Knex.Config = {
   },
   migrations: {
     tableName: 'migrations',
-    directory: './src/database/migrations',
+    directory: './dist/database/migrations',
   },
   seeds: {
-    directory: './src/database/seeds',
+    directory: './dist/database/seeds',
   },
   useNullAsDefault: true,
 };

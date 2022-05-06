@@ -1,7 +1,7 @@
 import knex, { Knex } from "knex";
 import { config } from "./config";
 
-let db: Knex | null = null;
+let db: Knex;
 
 export function connect() {
   if (db) {
@@ -19,7 +19,6 @@ export function disconnect() {
   }
 
   db.destroy();
-  db = null;
 }
 
 export { db };

@@ -12,8 +12,8 @@ export const replCommand: Command = {
     
         register('db', getDatabase(), 'knex instance');
         register('app', app, 'app');
-        register('user', app.userModule, 'user module');
-        register('post', app.postModule, 'post module');
+        register('userModule', app.userModule, 'user module');
+        register('postModule', app.postModule, 'post module');
       },
       welcomeMessage: 'Welcome to the repl!',
     });
