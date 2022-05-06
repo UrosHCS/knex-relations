@@ -1,6 +1,7 @@
 import { Command } from '..';
 import { boot } from '../../core';
 import { runRepl } from '../../lib/repl/repl';
+import { getDatabase } from '../../lib/table';
 
 export const replCommand: Command = {
   name: 'repl',
@@ -9,6 +10,7 @@ export const replCommand: Command = {
       context: async (register) => {
         const app = await boot();
     
+        register('db', getDatabase(), 'knex instance');
         register('app', app, 'app');
         register('user', app.userModule, 'user module');
         register('post', app.postModule, 'post module');

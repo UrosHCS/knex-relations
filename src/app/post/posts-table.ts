@@ -4,8 +4,7 @@ import { Table } from '../../lib/table';
 
 export interface Post {
   id: number;
-  title: string;
-  text: string;
+  body: string;
   user_id: number;
 }
 

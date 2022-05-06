@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --loader ts-node/esm src/index.ts",
+    "start": "node dist",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "cli": "node --loader ts-node/esm src/cli",
-    "repl": "node --loader ts-node/esm src/repl.ts",
+    "cli": "node dist/cli",
+    "repl": "npm run cli repl",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

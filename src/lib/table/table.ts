@@ -19,7 +19,7 @@ export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = 
 const DEFAULT_PRIMARY_KEY = 'id';
 
 export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>> {
-  readonly relations: R;
+  relations: R;
   readonly primaryKey: keyof Model;
   readonly db: DB;
 
@@ -29,9 +29,9 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     relationBuilder?: RelationBuilder<Model, R>,
     config?: TableConfig<Model>,
   ) {
-    this.relations = relationBuilder ? relationBuilder(this) : {} as R;
     this.primaryKey = config?.primaryKey ?? DEFAULT_PRIMARY_KEY;
     this.db = this.resolveDb(config?.db);
+    this.relations = relationBuilder ? relationBuilder(this) : {} as R;
   }
 
   private resolveDb<Model>(db: TableConfig<Model>['db']): DB {
