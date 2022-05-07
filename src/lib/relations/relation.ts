@@ -8,7 +8,12 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
     readonly parentTable: Table<Parent>,
     readonly childTable: Table<Child>,
     readonly relationName: N,
-  ) {}
+  ) {
+    console.log({
+      parent: parentTable.name,
+      child: childTable.name,
+    });
+  }
 
   /**
    * Return a promise that resolves to an array of child models

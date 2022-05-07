@@ -2,10 +2,9 @@ import { setDatabase } from "../lib/table";
 import { connect } from "./db";
 
 export async function boot() {
-  // Connect knex to the database and
-  console.log('step 1');
+  // Connect knex to the database
   const db = connect();
-  // set the database instance to the global variable
+  // and set the database instance to the global variable
   setDatabase(db);
 
   await db.migrate.up();

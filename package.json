@@ -9,7 +9,7 @@
     "build:watch": "tsc --watch",
     "cli": "node dist/cli",
     "repl": "node dist/cli repl",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --loader ts-node/esm tests"
   },
   "author": "",
   "license": "ISC",
@@ -17,8 +17,12 @@
     "knex": "^1.0.5"
   },
   "devDependencies": {
-    "@vscode/sqlite3": "^5.0.8",
+    "@japa/expect": "^1.1.4",
+    "@japa/run-failed-tests": "^1.0.7",
+    "@japa/runner": "^2.0.7",
+    "@japa/spec-reporter": "^1.1.12",
     "@types/node": "^17.0.24",
+    "@vscode/sqlite3": "^5.0.8",
     "better-sqlite3": "^7.5.1",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
