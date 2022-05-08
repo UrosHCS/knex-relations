@@ -17,7 +17,7 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {
-      const parentFK = parent[this.getParentRelationKey()];
+      const parentFK = parent[this.getParentRelationKey()] as ID;
       const child = childDictionary[parentFK];
       this.setRelation(parent, child || null);
     }
@@ -27,7 +27,7 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
     const childPK = this.childTable.primaryKey;
 
     return children.reduce<Record<ID, Child>>((dictionary, child) => {
-      const childId = child[childPK];
+      const childId = child[childPK] as ID;
       dictionary[childId] = child;
 
       return dictionary;

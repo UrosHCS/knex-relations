@@ -1,7 +1,8 @@
 import { Table } from '.';
+import { Row } from '../types';
 
-export abstract class Repository<TRecord> {
-  abstract table: Table<TRecord, any>;
+export abstract class Repository<TRecord extends Row> {
+  abstract table: Table<TRecord>;
 
   query() {
     return this.table.query();

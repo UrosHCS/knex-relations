@@ -1,4 +1,5 @@
 import { KnexQB, RelationsMap, Table } from '.';
+import { ID } from '../relations';
 import { Row } from '../types';
 
 export class QueryBuilder<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>> {
@@ -24,7 +25,7 @@ export class QueryBuilder<Model extends Row, R extends RelationsMap<Model> = Rel
   }
 
   wherePK(id: Model[typeof this.table.primaryKey]): this {
-    this.query.where('id', id);
+    this.query.where('id', id as ID);
     return this;
   }
 }

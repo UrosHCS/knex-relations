@@ -39,7 +39,7 @@ export abstract class Relation<
   loadChildren(parents: Parent[]): Promise<Child[]> {
     const key = this.getParentRelationKey();
 
-    const ids = parents.map(parent => parent[key]);
+    const ids = parents.map(parent => parent[key] as ID);
 
     return this.loadForIds(ids);
   }
@@ -52,7 +52,7 @@ export abstract class Relation<
 
     this.mapChildrenToParents(parents, children);
 
-    return parents;
+    return parents as Array<Parent & { [key in N]: Population }>;
   }
 
   /**

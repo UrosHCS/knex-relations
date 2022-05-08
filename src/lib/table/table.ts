@@ -12,7 +12,7 @@ export type TableConfig<Model> = {
 /**
  * Generic relations map.
  */
-export type RelationsMap<Parent> = Record<string, Relation<Parent, any, string, any>>;
+export type RelationsMap<Parent extends Row> = Record<string, Relation<Parent, any, string, any>>;
 
 export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
 

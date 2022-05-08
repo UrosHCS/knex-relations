@@ -12,7 +12,7 @@ export class HasOne<Parent extends Row, Child extends Row, N extends string> ext
     const childDictionary = this.buildDictionary(children);
 
     for (const parent of parents) {
-      const parentPK = parent[this.parentTable.primaryKey];
+      const parentPK = parent[this.parentTable.primaryKey] as ID;
       const child = childDictionary[parentPK];
       this.setRelation(parent, child || null);
     }
@@ -22,8 +22,8 @@ export class HasOne<Parent extends Row, Child extends Row, N extends string> ext
     const foreignKey = this.getForeignKeyName();
 
     return children.reduce<Record<ID, Child>>((dictionary, child) => {
-      const foreignValue = child[foreignKey];
-      dictionary[foreignValue] = child;
+      const childFK = child[foreignKey] as ID;
+      dictionary[childFK] = child;
       return dictionary;
     }, {});
   }

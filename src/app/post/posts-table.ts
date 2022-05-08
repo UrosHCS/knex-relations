@@ -2,11 +2,11 @@ import { User, usersTable } from '../user/users-table';
 import { BelongsTo } from '../../lib/relations';
 import { Table } from '../../lib/table';
 
-export interface Post {
+export type Post = {
   id: number;
   body: string;
   user_id: number;
-}
+};
 
 export type PostRelations = {
   user: BelongsTo<Post, User, 'user'>;

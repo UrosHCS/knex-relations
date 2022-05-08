@@ -2,11 +2,11 @@ import { Table } from '../../lib/table';
 import { BelongsToMany, HasMany } from '../../lib/relations';
 import { Post, postsTable } from '../post/posts-table';
 
-export interface User {
+export type User = {
   id: number;
   email: string;
   name: string;
-}
+};
 
 export type UserRelations = {
   posts: HasMany<User, Post, 'posts'>;
