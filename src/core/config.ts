@@ -1,4 +1,4 @@
-import { Knex } from "knex";
+import { Knex } from 'knex';
 
 const sqlite: Knex.Config = {
   client: 'better-sqlite3',
@@ -8,8 +8,8 @@ const sqlite: Knex.Config = {
   pool: {
     min: 1,
     max: 1,
-    destroyTimeoutMillis: 360000*1000, 
-    idleTimeoutMillis: 360000*1000 
+    destroyTimeoutMillis: 360000 * 1000,
+    idleTimeoutMillis: 360000 * 1000,
   },
   migrations: {
     tableName: 'migrations',

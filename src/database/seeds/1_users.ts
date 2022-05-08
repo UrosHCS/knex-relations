@@ -8,4 +8,4 @@ export async function seed(knex: Knex) {
     { id: 2, email: 'jack@example.com', name: 'Jack' },
     { id: 3, email: 'jane@example.com', name: 'Jane' },
   ]);
-};
+}

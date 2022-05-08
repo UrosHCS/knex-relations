@@ -1,6 +1,6 @@
-import { DB, getDatabase } from ".";
-import { Relation } from "../relations/relation";
-import { Row } from "../types";
+import { DB, getDatabase } from '.';
+import { Relation } from '../relations/relation';
+import { Row } from '../types';
 
 export type TableConfig<Model> = {
   // Table's primary key. Default is "id".
@@ -51,8 +51,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return this.dbIsFunction(db) ? db() : db;
   }
 
-
-  private dbIsFunction<Model>(db: TableConfig<Model>['db']): db is (() => DB) {
+  private dbIsFunction<Model>(db: TableConfig<Model>['db']): db is () => DB {
     return typeof db === 'function';
   }
 
@@ -61,9 +60,11 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   }
 
   async populateMany(results: Model[], relationNames: string[]): Promise<void> {
-    await Promise.all(relationNames.map(relationName => {
-      this.populate(results, relationName);
-    }));
+    await Promise.all(
+      relationNames.map(relationName => {
+        this.populate(results, relationName);
+      }),
+    );
   }
 
   getRelation<N extends keyof R>(relationName: N): R[N] {
@@ -78,7 +79,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
 
   populate<N extends keyof R>(results: Model[], relationName: N): ReturnType<R[N]['populate']> {
     const relation = this.getRelation(relationName);
-    // @ts-expect-error
+    // @ts-expect-error TS can't understand the right type here
     return relation.populate(results);
   }
 

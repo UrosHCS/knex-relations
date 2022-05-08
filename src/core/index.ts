@@ -1,5 +1,5 @@
-import { setDatabase } from "../lib/table";
-import { connect } from "./db";
+import { setDatabase } from '../lib/table';
+import { connect } from './db';
 
 export async function boot() {
   // Connect knex to the database

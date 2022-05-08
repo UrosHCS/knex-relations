@@ -1,3 +1,3 @@
-import { boot } from "./core";
+import { boot } from './core';
 
 boot();

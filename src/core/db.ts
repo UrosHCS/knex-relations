@@ -1,5 +1,5 @@
-import knex, { Knex } from "knex";
-import { config } from "./config";
+import knex, { Knex } from 'knex';
+import { config } from './config';
 
 let db: Knex;
 

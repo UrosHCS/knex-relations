@@ -1,6 +1,6 @@
-import { PostQueryBuilder } from "./post-query-builder";
-import { postRepository } from "./post-repository";
-import { postsTable } from "./posts-table";
+import { PostQueryBuilder } from './post-query-builder';
+import { postRepository } from './post-repository';
+import { postsTable } from './posts-table';
 
 export const postModule = {
   repo: postRepository,

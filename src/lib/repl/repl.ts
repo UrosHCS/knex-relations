@@ -27,19 +27,21 @@ export interface Config {
    * Whether to print registered variables in the repl. Default: true
    */
   printRegisteredVariables?: boolean;
-};
+}
 
 /**
  * @param config Repl configuration.
  */
 export const runRepl = async (config: Config): Promise<void> => {
   const defaultConfig: Required<Config> = {
-    context: () => {},
+    context: () => {
+      // empty context
+    },
     welcomeMessage: '',
     nodeReplHistoryPath: path.join(os.homedir(), '.node_repl_history'),
     onExit: process.exit,
     printRegisteredVariables: true,
-  }
+  };
 
   const options: Required<Config> = Object.assign(defaultConfig, config);
 
@@ -60,7 +62,7 @@ export const runRepl = async (config: Config): Promise<void> => {
 
   register('vars', vars, 'all the local vars');
 
-  replServer.setupHistory(options.nodeReplHistoryPath, (err) => {
+  replServer.setupHistory(options.nodeReplHistoryPath, err => {
     if (err) console.log(err);
   });
 

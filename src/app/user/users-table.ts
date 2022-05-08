@@ -1,6 +1,6 @@
-import { Table } from "../../lib/table";
-import { BelongsToMany, HasMany } from "../../lib/relations";
-import { Post, postsTable } from "../post/posts-table";
+import { Table } from '../../lib/table';
+import { BelongsToMany, HasMany } from '../../lib/relations';
+import { Post, postsTable } from '../post/posts-table';
 
 export interface User {
   id: number;

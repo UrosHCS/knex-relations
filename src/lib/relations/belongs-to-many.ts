@@ -1,17 +1,23 @@
-import { Row } from "../types";
-import { Relation } from "./relation";
-import { ID } from ".";
+import { Row } from '../types';
+import { Relation } from './relation';
+import { ID } from '.';
 
-export class BelongsToMany<Parent extends Row, Child extends Row, N extends string> extends Relation<Parent, Child, N, Child[]> {
+export class BelongsToMany<Parent extends Row, Child extends Row, N extends string> extends Relation<
+  Parent,
+  Child,
+  N,
+  Child[]
+> {
   queryFor(parentIds: ID[]) {
     const pivotTable = this.getPivotTableName();
 
-    return this.childTable.query()
+    return this.childTable
+      .query()
       .join(
         pivotTable,
         `${pivotTable}.${this.getChildForeignKey()}`,
         '=',
-        `${this.childTable.name}.${this.childTable.primaryKey}`
+        `${this.childTable.name}.${this.childTable.primaryKey}`,
       )
       .whereIn(`${pivotTable}.${this.getParentForeignKey()}`, parentIds);
   }
@@ -31,7 +37,7 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
 
     return children.reduce<Record<string, Child[]>>((dictionary, child) => {
       const foreignValue = child[foreignKey];
-      if(!dictionary[foreignValue]) {
+      if (!dictionary[foreignValue]) {
         dictionary[foreignValue] = [];
       }
       dictionary[foreignValue].push(child);
@@ -53,7 +59,7 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
   /**
    * Get column name in pivot table that points to the child table.
    */
-   private getChildForeignKey() {
+  private getChildForeignKey() {
     return `${this.childTable.singular}_id`;
   }
 

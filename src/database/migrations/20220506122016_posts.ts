@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 
 export function up(knex: Knex) {
-  return knex.schema.createTable('posts', (table) => {
+  return knex.schema.createTable('posts', table => {
     table.increments('id');
     table.string('body');
     table.integer('user_id').references('id').inTable('users').onDelete('CASCADE');

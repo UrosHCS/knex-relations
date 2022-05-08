@@ -1,14 +1,15 @@
-import { Knex } from "knex";
-import { Table } from "../table/table";
-import { Row } from "../types";
-import { ID } from ".";
+import { Knex } from 'knex';
+import { Table } from '../table/table';
+import { Row } from '../types';
+import { ID } from '.';
 
-export abstract class Relation<Parent extends Row, Child extends Row, N extends string, Population extends Child | Child[]> {
-  constructor(
-    readonly parentTable: Table<Parent>,
-    readonly childTable: Table<Child>,
-    readonly relationName: N,
-  ) {
+export abstract class Relation<
+  Parent extends Row,
+  Child extends Row,
+  N extends string,
+  Population extends Child | Child[],
+> {
+  constructor(readonly parentTable: Table<Parent>, readonly childTable: Table<Child>, readonly relationName: N) {
     console.log({
       parent: parentTable.name,
       child: childTable.name,
@@ -37,7 +38,7 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
 
   loadChildren(parents: Parent[]): Promise<Child[]> {
     const key = this.getParentRelationKey();
-  
+
     const ids = parents.map(parent => parent[key]);
 
     return this.loadForIds(ids);
@@ -60,7 +61,7 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   protected abstract getParentRelationKey(): keyof Parent;
 
   protected setRelation(parent: Parent, children: unknown): void {
-    // @ts-expect-error
+    // @ts-expect-error - We are adding new properties here, which is not something that TS likes.
     parent[this.relationName] = children;
   }
 }

@@ -1,8 +1,13 @@
-import {Row } from "../types";
-import { HasOneOrMany } from "./has-one-or-many";
-import { ID } from ".";
+import { Row } from '../types';
+import { HasOneOrMany } from './has-one-or-many';
+import { ID } from '.';
 
-export class HasMany<Parent extends Row, Child extends Row, N extends string> extends HasOneOrMany<Parent, Child, N, Child[]> {
+export class HasMany<Parent extends Row, Child extends Row, N extends string> extends HasOneOrMany<
+  Parent,
+  Child,
+  N,
+  Child[]
+> {
   mapChildrenToParents(parents: Parent[], children: Child[]): void {
     const childDictionary = this.buildDictionary(children);
 
@@ -18,7 +23,7 @@ export class HasMany<Parent extends Row, Child extends Row, N extends string> ex
 
     return children.reduce<Record<string, Child[]>>((dictionary, child) => {
       const foreignValue = child[foreignKey];
-      if(!dictionary[foreignValue]) {
+      if (!dictionary[foreignValue]) {
         dictionary[foreignValue] = [];
       }
       dictionary[foreignValue].push(child);

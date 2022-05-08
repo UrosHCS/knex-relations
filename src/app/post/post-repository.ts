@@ -1,5 +1,5 @@
-import { Repository } from "../../lib/table";
-import { Post, postsTable } from "./posts-table";
+import { Repository } from '../../lib/table';
+import { Post, postsTable } from './posts-table';
 
 class PostRepository extends Repository<Post> {
   table = postsTable;

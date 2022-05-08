@@ -1,7 +1,7 @@
 import { argv } from 'process';
 import { commands } from './commands';
 
-const [nodePath, filePath, commandName, ...args] = argv;
+const [, , commandName, ...args] = argv;
 
 export interface Command {
   name: string;

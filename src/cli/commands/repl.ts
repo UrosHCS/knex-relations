@@ -7,9 +7,9 @@ export const replCommand: Command = {
   name: 'repl',
   handler: async () => {
     await runRepl({
-      context: async (register) => {
+      context: async register => {
         const app = await boot();
-    
+
         register('db', getDatabase(), 'knex instance');
         register('app', app, 'app');
         register('userModule', app.userModule, 'user module');
@@ -18,4 +18,4 @@ export const replCommand: Command = {
       welcomeMessage: 'Welcome to the repl!',
     });
   },
-}
+};

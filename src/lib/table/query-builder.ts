@@ -1,5 +1,5 @@
-import { KnexQB, RelationsMap, Table } from ".";
-import { Row } from "../types";
+import { KnexQB, RelationsMap, Table } from '.';
+import { Row } from '../types';
 
 export class QueryBuilder<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>> {
   query: KnexQB<Model>;

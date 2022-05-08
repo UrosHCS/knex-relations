@@ -1,7 +1,7 @@
-import { expect } from '@japa/expect'
-import { specReporter } from '@japa/spec-reporter'
-import { runFailedTests } from '@japa/run-failed-tests'
-import { processCliArgs, configure, run } from '@japa/runner'
+import { expect } from '@japa/expect';
+import { specReporter } from '@japa/spec-reporter';
+import { runFailedTests } from '@japa/run-failed-tests';
+import { processCliArgs, configure, run } from '@japa/runner';
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +21,7 @@ configure({
   files: ['tests/**/*.test.ts'],
   plugins: [expect(), runFailedTests()],
   reporters: [specReporter()],
-  importer: (filePath) => import(filePath),
+  importer: filePath => import(filePath),
 });
 
 /*
