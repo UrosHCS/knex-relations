@@ -6,7 +6,7 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
   Parent,
   Child,
   N,
-  Child
+  Child[]
 > {
   queryFor(parentForeignIds: ID[]) {
     // TODO: remove " as string"

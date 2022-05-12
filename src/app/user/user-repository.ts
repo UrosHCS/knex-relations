@@ -5,9 +5,14 @@ class UserRepository extends Repository<User> {
   table = usersTable;
 
   async test() {
-    const users = await this.select().limit(10);
-    const populatedUsers = this.table.populate(users, 'posts');
-    return populatedUsers;
+    const users = await this.query().limit(10);
+    const specialUsers = await this.table.load(users, 'posts', async qb => {
+      return qb.select('body');
+    });
+    const withPosts = await this.table.load(users, 'posts');
+    const withFriends = await this.table.load(users, 'friends');
+
+    return withPosts;
   }
 
   latest(limit: number) {

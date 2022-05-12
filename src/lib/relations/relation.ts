@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 import { Table } from '../table/table';
-import { Row } from '../types';
+import { QBCallback, Row } from '../types';
 import { ID } from '.';
 
 export abstract class Relation<
@@ -36,23 +36,34 @@ export abstract class Relation<
    */
   abstract mapChildrenToParents(parents: Parent[], children: Child[]): void;
 
-  loadChildren(parents: Parent[]): Promise<Child[]> {
+  loadChildren<T>(parents: Parent[], callback?: QBCallback<Child, T>): Promise<Array<Child | T>> {
     const key = this.getParentRelationKey();
 
     const ids = parents.map(parent => parent[key] as ID);
 
-    return this.loadForIds(ids);
+    const qb = this.queryFor(ids);
+
+    if (callback) {
+      return callback(qb);
+    }
+
+    return qb;
   }
 
   /**
    * Load children and assign them to the given parents.
    */
-  async populate(parents: Parent[]): Promise<Array<Parent & { [key in N]: Population }>> {
-    const children = await this.loadChildren(parents);
+  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: Population }>>;
+  load<T>(
+    parents: Parent[],
+    callback: QBCallback<Child, T>,
+  ): Promise<Array<Parent & { [key in N]: Population extends any[] ? T[] : T }>>;
+  async load<T>(parents: Parent[], callback?: QBCallback<Child, T>) {
+    const children = await this.loadChildren(parents, callback);
 
-    this.mapChildrenToParents(parents, children);
+    this.mapChildrenToParents(parents, children as Child[]);
 
-    return parents as Array<Parent & { [key in N]: Population }>;
+    return parents;
   }
 
   /**

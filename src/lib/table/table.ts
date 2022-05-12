@@ -1,6 +1,6 @@
-import { DB, getDatabase } from '.';
+import { DB, getDatabase, KnexQB } from '.';
 import { Relation } from '../relations/relation';
-import { Row } from '../types';
+import { QBCallback, Row } from '../types';
 
 export type TableConfig<Model> = {
   // Table's primary key. Default is "id".
@@ -15,6 +15,9 @@ export type TableConfig<Model> = {
 export type RelationsMap<Parent extends Row> = Record<string, Relation<Parent, any, string, any>>;
 
 export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
+
+export type ResolveChild<T> = T extends Relation<infer P, infer Child, infer N, infer A> ? Child : never;
+export type ResolvePopulation<T> = T extends Relation<infer P, infer C, infer N, infer Population> ? Population : never;
 
 const DEFAULT_PRIMARY_KEY = 'id';
 
@@ -59,10 +62,10 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return this.db<Model>(this.name);
   }
 
-  async populateMany(results: Model[], relationNames: string[]): Promise<void> {
+  async loadMany(results: Model[], relationNames: string[]): Promise<void> {
     await Promise.all(
       relationNames.map(relationName => {
-        this.populate(results, relationName);
+        this.load(results, relationName);
       }),
     );
   }
@@ -77,13 +80,32 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return relation;
   }
 
-  populate<N extends keyof R>(results: Model[], relationName: N): ReturnType<R[N]['populate']> {
+  load<N extends keyof R>(
+    results: Model[],
+    relationName: N,
+  ): Promise<
+    Array<
+      Model & {
+        [key in N]: ResolvePopulation<R[N]>;
+      }
+    >
+  >;
+  load<N extends keyof R, T>(
+    results: Model[],
+    relationName: N,
+    callback: QBCallback<ResolveChild<R[N]>, T>,
+  ): Promise<Array<Model & { [key in N]: ResolvePopulation<R[N]> extends any[] ? T[] : T }>>;
+  load<N extends keyof R, T>(results: Model[], relationName: N, callback?: QBCallback<ResolveChild<R[N]>, T>) {
     const relation = this.getRelation(relationName);
-    // @ts-expect-error TS can't understand the right type here
-    return relation.populate(results);
+
+    if (callback) {
+      return relation.load(results, callback);
+    }
+
+    return relation.load(results);
   }
 
-  async populateNested<T extends Model[]>(results: Model[], nestedRelationNames: string): Promise<T> {
+  async loadNested<T extends Model[]>(results: Model[], nestedRelationNames: string): Promise<T> {
     const relationNames = nestedRelationNames.split('.');
 
     // relationNames.length should never be zero because .split()
@@ -104,7 +126,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     }
 
     if (nestedRelationNames.length === 1) {
-      return this.populate(results, relationName) as Promise<T>;
+      return this.load(results, relationName) as unknown as Promise<T>;
     }
 
     const relation = this.getRelation(relationName);
