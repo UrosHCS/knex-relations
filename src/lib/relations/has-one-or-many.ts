@@ -6,8 +6,8 @@ export abstract class HasOneOrMany<
   Parent extends Row,
   Child extends Row,
   N extends string,
-  Population extends Child | Child[],
-> extends Relation<Parent, Child, N, Population> {
+  IsOne extends boolean,
+> extends Relation<Parent, Child, N, IsOne> {
   queryFor(parentIds: ID[]) {
     // TODO: remove " as string"
     return this.childTable.query().whereIn(this.getForeignKeyName() as string, parentIds);

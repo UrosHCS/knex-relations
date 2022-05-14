@@ -7,7 +7,7 @@ class UserRepository extends Repository<User> {
   async test() {
     const users = await this.query().limit(10);
     const specialUsers = await this.table.load(users, 'posts', async qb => {
-      return qb.select('body');
+      return qb.select('body').then(rows => rows);
     });
     const withPosts = await this.table.load(users, 'posts');
     const withFriends = await this.table.load(users, 'friends');

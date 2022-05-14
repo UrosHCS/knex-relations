@@ -2,12 +2,12 @@ import { Row } from '../types';
 import { Relation } from './relation';
 import { ID } from '.';
 
-export class BelongsTo<Parent extends Row, Child extends Row, N extends string> extends Relation<
-  Parent,
-  Child,
-  N,
-  Child[]
-> {
+export class BelongsTo<
+  Parent extends Row,
+  Child extends Row,
+  N extends string,
+  IsOne extends boolean = true,
+> extends Relation<Parent, Child, N, IsOne> {
   queryFor(parentForeignIds: ID[]) {
     // TODO: remove " as string"
     return this.childTable.query().whereIn(this.childTable.primaryKey as string, parentForeignIds);

@@ -3,12 +3,7 @@ import { Table } from '../table/table';
 import { QBCallback, Row } from '../types';
 import { ID } from '.';
 
-export abstract class Relation<
-  Parent extends Row,
-  Child extends Row,
-  N extends string,
-  Population extends Child | Child[],
-> {
+export abstract class Relation<Parent extends Row, Child extends Row, N extends string, IsOne extends boolean> {
   constructor(readonly parentTable: Table<Parent>, readonly childTable: Table<Child>, readonly relationName: N) {
     console.log({
       parent: parentTable.name,
@@ -53,11 +48,11 @@ export abstract class Relation<
   /**
    * Load children and assign them to the given parents.
    */
-  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: Population }>>;
+  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: IsOne extends true ? Child : Child[] }>>;
   load<T>(
     parents: Parent[],
     callback: QBCallback<Child, T>,
-  ): Promise<Array<Parent & { [key in N]: Population extends any[] ? T[] : T }>>;
+  ): Promise<Array<Parent & { [key in N]: IsOne extends true ? T : T[] }>>;
   async load<T>(parents: Parent[], callback?: QBCallback<Child, T>) {
     const children = await this.loadChildren(parents, callback);
 

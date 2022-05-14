@@ -17,7 +17,7 @@ export type RelationsMap<Parent extends Row> = Record<string, Relation<Parent, a
 export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
 
 export type ResolveChild<T> = T extends Relation<infer P, infer Child, infer N, infer A> ? Child : never;
-export type ResolvePopulation<T> = T extends Relation<infer P, infer C, infer N, infer Population> ? Population : never;
+export type ResolveIsOne<T> = T extends Relation<infer P, infer C, infer N, infer IsOne> ? IsOne : never;
 
 const DEFAULT_PRIMARY_KEY = 'id';
 
@@ -86,7 +86,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   ): Promise<
     Array<
       Model & {
-        [key in N]: ResolvePopulation<R[N]>;
+        [key in N]: ResolveIsOne<R[N]> extends true ? ResolveChild<R[N]> : ResolveChild<R[N]>[];
       }
     >
   >;
@@ -94,7 +94,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     results: Model[],
     relationName: N,
     callback: QBCallback<ResolveChild<R[N]>, T>,
-  ): Promise<Array<Model & { [key in N]: ResolvePopulation<R[N]> extends any[] ? T[] : T }>>;
+  ): Promise<Array<Model & { [key in N]: ResolveIsOne<R[N]> extends true ? T : T[] }>>;
   load<N extends keyof R, T>(results: Model[], relationName: N, callback?: QBCallback<ResolveChild<R[N]>, T>) {
     const relation = this.getRelation(relationName);
 
