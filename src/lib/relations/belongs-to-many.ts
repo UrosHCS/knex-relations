@@ -2,12 +2,12 @@ import { Row } from '../types';
 import { Relation } from './relation';
 import { ID } from '.';
 
-export class BelongsToMany<
-  Parent extends Row,
-  Child extends Row,
-  N extends string,
-  IsOne extends boolean = false,
-> extends Relation<Parent, Child, N, IsOne> {
+export class BelongsToMany<Parent extends Row, Child extends Row, N extends string> extends Relation<
+  Parent,
+  Child,
+  N,
+  false
+> {
   queryFor(parentIds: ID[]) {
     const pivotTable = this.getPivotTableName();
 
@@ -32,8 +32,8 @@ export class BelongsToMany<
     }
   }
 
-  isToOne(): IsOne {
-    return false as IsOne;
+  isToOne(): false {
+    return false;
   }
 
   protected getColumnForDictionaryKey(): string {

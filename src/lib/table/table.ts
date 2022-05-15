@@ -1,7 +1,6 @@
-import { DB, getDatabase, KnexQB } from '.';
+import { DB, getDatabase } from '.';
 import { Relation } from '../relations/relation';
 import { QBCallback, Row } from '../types';
-import { BaseLoad, CustomLoad } from '../relations';
 
 export type TableConfig<Model> = {
   // Table's primary key. Default is "id".
@@ -94,10 +93,11 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     const relation = this.getRelation(relationName);
 
     if (callback) {
-      return relation.load(results, callback) as any;
+      return relation.load(results, callback);
     }
 
-    return relation.load(results);
+    // TODO: make relation.load and table.load compatible and remove "as any".
+    return relation.load(results) as any;
   }
 
   async loadNested<T extends Model[]>(results: Model[], nestedRelationNames: string): Promise<T> {

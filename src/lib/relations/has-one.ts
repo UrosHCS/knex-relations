@@ -2,12 +2,12 @@ import { Row } from '../types';
 import { HasOneOrMany } from './has-one-or-many';
 import { ID } from '.';
 
-export class HasOne<
-  Parent extends Row,
-  Child extends Row,
-  N extends string,
-  IsOne extends boolean = true,
-> extends HasOneOrMany<Parent, Child, N, IsOne> {
+export class HasOne<Parent extends Row, Child extends Row, N extends string> extends HasOneOrMany<
+  Parent,
+  Child,
+  N,
+  true
+> {
   mapChildrenToParents(parents: Parent[], children: Child[]): void {
     const childDictionary = this.buildDictionary(children);
 
@@ -18,8 +18,8 @@ export class HasOne<
     }
   }
 
-  isToOne(): IsOne {
-    return true as IsOne;
+  isToOne(): true {
+    return true;
   }
 
   // private buildDictionary(children: Child[]): Record<ID, Child> {

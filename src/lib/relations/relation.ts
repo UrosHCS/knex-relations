@@ -3,14 +3,6 @@ import { Table } from '../table/table';
 import { QBCallback, Row } from '../types';
 import { ID } from '.';
 
-export type BaseLoad<R> = R extends Relation<infer Parent, infer Child, infer N, infer IsOne>
-  ? Array<Parent & { [key in N]: IsOne extends true ? Child : Child[] }>
-  : never;
-
-export type CustomLoad<R, T> = R extends Relation<infer Parent, infer Child, infer N, infer IsOne>
-  ? Array<Parent & { [key in N]: IsOne extends true ? T : T[] }>
-  : never;
-
 export abstract class Relation<Parent extends Row, Child extends Row, N extends string, IsOne extends boolean> {
   constructor(readonly parentTable: Table<Parent>, readonly childTable: Table<Child>, readonly relationName: N) {
     console.log({
