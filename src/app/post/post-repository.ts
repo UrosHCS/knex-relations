@@ -6,8 +6,11 @@ class PostRepository extends Repository<Post> {
 
   async test() {
     const posts = await this.select().limit(10);
-    const populatedPosts = this.table.relations.user.load(posts);
-    const populatedPosts2 = this.table.load(posts, 'user');
+    const populatedPosts = await this.table.relations.user.load(posts);
+    const populatedPosts2 = await this.table.load(posts, 'user');
+    const populatedPosts3 = await this.table.load(posts, 'user', qb => {
+      return qb.select('id', 'email').then(rows => rows);
+    });
   }
 
   latest(limit: number) {

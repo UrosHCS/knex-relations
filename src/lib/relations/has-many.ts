@@ -18,16 +18,20 @@ export class HasMany<
     }
   }
 
-  private buildDictionary(children: Child[]): Record<ID, Child[]> {
-    const foreignKey = this.getForeignKeyName();
-
-    return children.reduce<Record<string, Child[]>>((dictionary, child) => {
-      const foreignValue = child[foreignKey] as ID;
-      if (!dictionary[foreignValue]) {
-        dictionary[foreignValue] = [];
-      }
-      dictionary[foreignValue].push(child);
-      return dictionary;
-    }, {});
+  isToOne(): IsOne {
+    return false as IsOne;
   }
+
+  // private buildDictionary(children: Child[]): Record<ID, Child[]> {
+  //   const foreignKey = this.getForeignKeyName();
+
+  //   return children.reduce<Record<string, Child[]>>((dictionary, child) => {
+  //     const foreignValue = child[foreignKey] as ID;
+  //     if (!dictionary[foreignValue]) {
+  //       dictionary[foreignValue] = [];
+  //     }
+  //     dictionary[foreignValue].push(child);
+  //     return dictionary;
+  //   }, {});
+  // }
 }

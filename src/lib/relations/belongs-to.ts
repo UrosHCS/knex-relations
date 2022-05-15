@@ -23,16 +23,24 @@ export class BelongsTo<
     }
   }
 
-  private buildDictionary(children: Child[]): Record<ID, Child> {
-    const childPK = this.childTable.primaryKey;
-
-    return children.reduce<Record<ID, Child>>((dictionary, child) => {
-      const childId = child[childPK] as ID;
-      dictionary[childId] = child;
-
-      return dictionary;
-    }, {});
+  isToOne(): IsOne {
+    return true as IsOne;
   }
+
+  protected getColumnForDictionaryKey(): string {
+    return this.childTable.primaryKey as string;
+  }
+
+  // private buildDictionary(children: Child[]): Record<ID, Child> {
+  //   const childPK = this.childTable.primaryKey;
+
+  //   return children.reduce<Record<ID, Child>>((dictionary, child) => {
+  //     const childId = child[childPK] as ID;
+  //     dictionary[childId] = child;
+
+  //     return dictionary;
+  //   }, {});
+  // }
 
   /**
    * Get column name in the parent table that points to the child table.

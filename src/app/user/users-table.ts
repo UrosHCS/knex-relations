@@ -9,8 +9,8 @@ export type User = {
 };
 
 export type UserRelations = {
-  posts: HasMany<User, Post, 'posts'>;
-  friends: BelongsToMany<User, User, 'friends'>;
+  posts: HasMany<User, Post, 'posts', false>;
+  friends: BelongsToMany<User, User, 'friends', false>;
 };
 
 export const usersTable: Table<User, UserRelations> = new Table('users', 'user', () => ({

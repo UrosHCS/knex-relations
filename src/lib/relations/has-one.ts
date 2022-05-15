@@ -18,13 +18,17 @@ export class HasOne<
     }
   }
 
-  private buildDictionary(children: Child[]): Record<ID, Child> {
-    const foreignKey = this.getForeignKeyName();
-
-    return children.reduce<Record<ID, Child>>((dictionary, child) => {
-      const childFK = child[foreignKey] as ID;
-      dictionary[childFK] = child;
-      return dictionary;
-    }, {});
+  isToOne(): IsOne {
+    return true as IsOne;
   }
+
+  // private buildDictionary(children: Child[]): Record<ID, Child> {
+  //   const foreignKey = this.getForeignKeyName();
+
+  //   return children.reduce<Record<ID, Child>>((dictionary, child) => {
+  //     const childFK = child[foreignKey] as ID;
+  //     dictionary[childFK] = child;
+  //     return dictionary;
+  //   }, {});
+  // }
 }

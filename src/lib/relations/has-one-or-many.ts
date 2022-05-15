@@ -13,6 +13,10 @@ export abstract class HasOneOrMany<
     return this.childTable.query().whereIn(this.getForeignKeyName() as string, parentIds);
   }
 
+  protected getColumnForDictionaryKey(): string {
+    return this.getForeignKeyName() as string;
+  }
+
   /**
    * Get column name in the child table that points to the parent table.
    */

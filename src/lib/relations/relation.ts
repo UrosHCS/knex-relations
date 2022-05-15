@@ -3,6 +3,14 @@ import { Table } from '../table/table';
 import { QBCallback, Row } from '../types';
 import { ID } from '.';
 
+export type BaseLoad<R> = R extends Relation<infer Parent, infer Child, infer N, infer IsOne>
+  ? Array<Parent & { [key in N]: IsOne extends true ? Child : Child[] }>
+  : never;
+
+export type CustomLoad<R, T> = R extends Relation<infer Parent, infer Child, infer N, infer IsOne>
+  ? Array<Parent & { [key in N]: IsOne extends true ? T : T[] }>
+  : never;
+
 export abstract class Relation<Parent extends Row, Child extends Row, N extends string, IsOne extends boolean> {
   constructor(readonly parentTable: Table<Parent>, readonly childTable: Table<Child>, readonly relationName: N) {
     console.log({
@@ -12,24 +20,46 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   }
 
   /**
-   * Return a promise that resolves to an array of child models
+   * Return a query builder that resolves to an array of child models
    * based on the given ids. The ids are parent ids in a has-many
    * and belongs-to-many relations, and parent foreign key ids
    * in a belongs-to relation.
    */
-  loadForIds(ids: ID[]): Promise<Child[]> {
-    return this.queryFor(ids);
-  }
+  abstract queryFor(ids: ID[]): Knex.QueryBuilder<Child>;
 
   /**
-   * Return a query builder that can be used to query for child models.
+   * Returns boolean if the relation is a *-to-one relation.
    */
-  abstract queryFor(ids: ID[]): Knex.QueryBuilder<Child>;
+  abstract isToOne(): IsOne;
 
   /**
    * Assign the given children to the given parents, where the key will be the relationName.
    */
   abstract mapChildrenToParents(parents: Parent[], children: Child[]): void;
+
+  protected abstract getColumnForDictionaryKey(): string;
+
+  protected buildDictionary(children: Child[]): Record<ID, IsOne extends true ? Child : Child[]> {
+    const keyColumn = this.getColumnForDictionaryKey();
+
+    return children.reduce<Record<ID, IsOne extends true ? Child : Child[]>>((dictionary, child) => {
+      const key = child[keyColumn] as ID;
+
+      if (this.isToOne()) {
+        // @ts-expect-error isToOne need "IsOne is true"
+        dictionary[key] = child;
+      } else {
+        if (!dictionary[key]) {
+          // @ts-expect-error isToOne need "IsOne is true"
+          dictionary[key] = [];
+        }
+        // @ts-expect-error isToOne need "IsOne is true"
+        dictionary[key].push(child);
+      }
+
+      return dictionary;
+    }, {});
+  }
 
   loadChildren<T>(parents: Parent[], callback?: QBCallback<Child, T>): Promise<Array<Child | T>> {
     const key = this.getParentRelationKey();

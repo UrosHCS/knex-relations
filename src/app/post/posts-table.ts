@@ -9,7 +9,7 @@ export type Post = {
 };
 
 export type PostRelations = {
-  user: BelongsTo<Post, User, 'user'>;
+  user: BelongsTo<Post, User, 'user', true>;
 };
 
 export const postsTable: Table<Post, PostRelations> = new Table('posts', 'post', postsTable => ({

@@ -1,6 +1,7 @@
 import { DB, getDatabase, KnexQB } from '.';
 import { Relation } from '../relations/relation';
 import { QBCallback, Row } from '../types';
+import { BaseLoad, CustomLoad } from '../relations';
 
 export type TableConfig<Model> = {
   // Table's primary key. Default is "id".
@@ -12,12 +13,12 @@ export type TableConfig<Model> = {
 /**
  * Generic relations map.
  */
-export type RelationsMap<Parent extends Row> = Record<string, Relation<Parent, any, string, any>>;
+export type RelationsMap<Parent extends Row> = Record<string, Relation<Parent, any, string, boolean>>;
 
 export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
 
-export type ResolveChild<T> = T extends Relation<infer P, infer Child, infer N, infer A> ? Child : never;
-export type ResolveIsOne<T> = T extends Relation<infer P, infer C, infer N, infer IsOne> ? IsOne : never;
+export type ResolveChild<T> = T extends Relation<any, infer Child, any, any> ? Child : never;
+export type ResolveIsOne<T> = T extends Relation<any, any, any, infer IsOne> ? IsOne : never;
 
 const DEFAULT_PRIMARY_KEY = 'id';
 
@@ -83,23 +84,17 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   load<N extends keyof R>(
     results: Model[],
     relationName: N,
-  ): Promise<
-    Array<
-      Model & {
-        [key in N]: ResolveIsOne<R[N]> extends true ? ResolveChild<R[N]> : ResolveChild<R[N]>[];
-      }
-    >
-  >;
+  ): Promise<Model & { [key in N]: ResolveIsOne<R[N]> extends true ? ResolveChild<R[N]> : ResolveChild<R[N]>[] }>;
   load<N extends keyof R, T>(
     results: Model[],
     relationName: N,
     callback: QBCallback<ResolveChild<R[N]>, T>,
-  ): Promise<Array<Model & { [key in N]: ResolveIsOne<R[N]> extends true ? T : T[] }>>;
+  ): Promise<Model & { [key in N]: ResolveIsOne<R[N]> extends true ? T : T[] }>;
   load<N extends keyof R, T>(results: Model[], relationName: N, callback?: QBCallback<ResolveChild<R[N]>, T>) {
     const relation = this.getRelation(relationName);
 
     if (callback) {
-      return relation.load(results, callback);
+      return relation.load(results, callback) as any;
     }
 
     return relation.load(results);
@@ -133,9 +128,9 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
 
     const children = await relation.loadChildren(results);
 
-    relation.childTable.doLoadNested(children, nestedRelationNames.slice(1));
+    relation.childTable.doLoadNested(children as Row[], nestedRelationNames.slice(1));
 
-    relation.mapChildrenToParents(results, children);
+    relation.mapChildrenToParents(results, children as Row[]);
 
     return results as T;
   }
