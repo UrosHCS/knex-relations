@@ -8,6 +8,8 @@ export class HasMany<Parent extends Row, Child extends Row, N extends string> ex
   N,
   false
 > {
+  isToOne: false = false;
+
   mapChildrenToParents(parents: Parent[], children: Child[]): void {
     const childDictionary = this.buildDictionary(children);
 
@@ -17,21 +19,4 @@ export class HasMany<Parent extends Row, Child extends Row, N extends string> ex
       this.setRelation(parent, childrenOfParent || []);
     }
   }
-
-  isToOne(): false {
-    return false;
-  }
-
-  // private buildDictionary(children: Child[]): Record<ID, Child[]> {
-  //   const foreignKey = this.getForeignKeyName();
-
-  //   return children.reduce<Record<string, Child[]>>((dictionary, child) => {
-  //     const foreignValue = child[foreignKey] as ID;
-  //     if (!dictionary[foreignValue]) {
-  //       dictionary[foreignValue] = [];
-  //     }
-  //     dictionary[foreignValue].push(child);
-  //     return dictionary;
-  //   }, {});
-  // }
 }

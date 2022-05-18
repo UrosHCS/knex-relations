@@ -8,8 +8,9 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
   N,
   true
 > {
+  isToOne: true = true;
+
   queryFor(parentForeignIds: ID[]) {
-    // TODO: remove " as string"
     return this.childTable.query().whereIn(this.childTable.primaryKey as string, parentForeignIds);
   }
 
@@ -23,24 +24,9 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
     }
   }
 
-  isToOne(): true {
-    return true;
-  }
-
   protected getColumnForDictionaryKey(): string {
     return this.childTable.primaryKey as string;
   }
-
-  // private buildDictionary(children: Child[]): Record<ID, Child> {
-  //   const childPK = this.childTable.primaryKey;
-
-  //   return children.reduce<Record<ID, Child>>((dictionary, child) => {
-  //     const childId = child[childPK] as ID;
-  //     dictionary[childId] = child;
-
-  //     return dictionary;
-  //   }, {});
-  // }
 
   /**
    * Get column name in the parent table that points to the child table.

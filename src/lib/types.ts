@@ -7,4 +7,4 @@ export type Row = Record<string, unknown>;
  */
 export type QBCallback<Model, T> = (qb: KnexQB<Model>) => Promise<T[]>;
 
-export type Population<IsOne, T> = IsOne extends true ? T : T[];
+export type ChildShape<IsOne, T> = IsOne extends true ? T : T[];

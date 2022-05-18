@@ -1,6 +1,6 @@
 import { DB, getDatabase } from '.';
 import { Relation } from '../relations/relation';
-import { Population, QBCallback, Row } from '../types';
+import { ChildShape, QBCallback, Row } from '../types';
 
 export type TableConfig<Model> = {
   // Table's primary key. Default is "id".
@@ -83,12 +83,12 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   load<N extends keyof R>(
     results: Model[],
     relationName: N,
-  ): Promise<Model & { [key in N]: Population<ResolveIsOne<R[N]>, ResolveChild<R[N]>> }>;
+  ): Promise<Array<Model & { [key in N]: ChildShape<ResolveIsOne<R[N]>, ResolveChild<R[N]>> }>>;
   load<N extends keyof R, T>(
     results: Model[],
     relationName: N,
     callback: QBCallback<ResolveChild<R[N]>, T>,
-  ): Promise<Model & { [key in N]: Population<ResolveIsOne<R[N]>, T> }>;
+  ): Promise<Array<Model & { [key in N]: ChildShape<ResolveIsOne<R[N]>, T> }>>;
   load<N extends keyof R, T>(results: Model[], relationName: N, callback?: QBCallback<ResolveChild<R[N]>, T>) {
     const relation = this.getRelation(relationName);
 
@@ -96,8 +96,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
       return relation.load(results, callback);
     }
 
-    // TODO: make relation.load and table.load compatible and remove "as any".
-    return relation.load(results) as any;
+    return relation.load(results);
   }
 
   async loadNested<T extends Model[]>(results: Model[], nestedRelationNames: string): Promise<T> {
@@ -121,16 +120,16 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     }
 
     if (nestedRelationNames.length === 1) {
-      return this.load(results, relationName) as unknown as Promise<T>;
+      return this.load(results, relationName) as Promise<T>;
     }
 
     const relation = this.getRelation(relationName);
 
     const children = await relation.loadChildren(results);
 
-    relation.childTable.doLoadNested(children as Row[], nestedRelationNames.slice(1));
+    relation.childTable.doLoadNested(children, nestedRelationNames.slice(1));
 
-    relation.mapChildrenToParents(results, children as Row[]);
+    relation.mapChildrenToParents(results, children);
 
     return results as T;
   }

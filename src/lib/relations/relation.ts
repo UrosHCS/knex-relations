@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 import { Table } from '../table/table';
-import { Population, QBCallback, Row } from '../types';
+import { ChildShape, QBCallback, Row } from '../types';
 import { ID } from '.';
 
 export abstract class Relation<Parent extends Row, Child extends Row, N extends string, IsOne extends boolean> {
@@ -15,9 +15,9 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   abstract queryFor(ids: ID[]): Knex.QueryBuilder<Child>;
 
   /**
-   * Returns boolean if the relation is a *-to-one relation.
+   * Boolean if the relation is a *-to-one relation.
    */
-  abstract isToOne(): IsOne;
+  abstract isToOne: IsOne;
 
   /**
    * Assign the given children to the given parents, where the key will be the relationName.
@@ -26,26 +26,38 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
 
   protected abstract getColumnForDictionaryKey(): string;
 
-  protected buildDictionary(children: Child[]): Record<ID, Population<IsOne, Child>> {
+  protected buildDictionary(children: Child[]): Record<ID, ChildShape<IsOne, Child>> {
     const keyColumn = this.getColumnForDictionaryKey();
 
-    return children.reduce<Record<ID, Population<IsOne, Child>>>((dictionary, child) => {
-      const key = child[keyColumn] as ID;
+    const reducer = this.isToOne
+      ? (d: Record<ID, Child>, c: Child) => this.singleChildDictionaryReducer(d, c, keyColumn)
+      : (d: Record<ID, Child[]>, c: Child) => this.childArrayDictionaryReducer(d, c, keyColumn);
 
-      if (this.isToOne()) {
-        // @ts-expect-error isToOne need "IsOne is true"
-        dictionary[key] = child;
-      } else {
-        if (!dictionary[key]) {
-          // @ts-expect-error isToOne need "IsOne is true"
-          dictionary[key] = [];
-        }
-        // @ts-expect-error isToOne need "IsOne is true"
-        dictionary[key].push(child);
-      }
+    // TODO: Remove as any
+    return children.reduce<Record<ID, ChildShape<IsOne, Child>>>(reducer as any, {});
+  }
 
-      return dictionary;
-    }, {});
+  protected singleChildDictionaryReducer(
+    dictionary: Record<ID, Child>,
+    child: Child,
+    keyColumn: string,
+  ): Record<ID, Child> {
+    const key = child[keyColumn] as ID;
+    dictionary[key] = child;
+    return dictionary;
+  }
+
+  protected childArrayDictionaryReducer(
+    dictionary: Record<ID, Child[]>,
+    child: Child,
+    keyColumn: string,
+  ): Record<ID, Child[]> {
+    const key = child[keyColumn] as ID;
+    if (!dictionary[key]) {
+      dictionary[key] = [];
+    }
+    dictionary[key].push(child);
+    return dictionary;
   }
 
   loadChildren<T>(parents: Parent[], callback?: QBCallback<Child, T>): Promise<Array<Child | T>> {
@@ -65,11 +77,11 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   /**
    * Load children and assign them to the given parents.
    */
-  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: Population<IsOne, Child> }>>;
+  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: ChildShape<IsOne, Child> }>>;
   load<T>(
     parents: Parent[],
     callback: QBCallback<Child, T>,
-  ): Promise<Array<Parent & { [key in N]: Population<IsOne, T> }>>;
+  ): Promise<Array<Parent & { [key in N]: ChildShape<IsOne, T> }>>;
   async load<T>(parents: Parent[], callback?: QBCallback<Child, T>) {
     const children = await this.loadChildren(parents, callback);
 
