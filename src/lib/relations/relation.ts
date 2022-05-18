@@ -1,15 +1,10 @@
 import { Knex } from 'knex';
 import { Table } from '../table/table';
-import { QBCallback, Row } from '../types';
+import { Population, QBCallback, Row } from '../types';
 import { ID } from '.';
 
 export abstract class Relation<Parent extends Row, Child extends Row, N extends string, IsOne extends boolean> {
-  constructor(readonly parentTable: Table<Parent>, readonly childTable: Table<Child>, readonly relationName: N) {
-    console.log({
-      parent: parentTable.name,
-      child: childTable.name,
-    });
-  }
+  constructor(readonly parentTable: Table<Parent>, readonly childTable: Table<Child>, readonly relationName: N) {}
 
   /**
    * Return a query builder that resolves to an array of child models
@@ -31,10 +26,10 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
 
   protected abstract getColumnForDictionaryKey(): string;
 
-  protected buildDictionary(children: Child[]): Record<ID, IsOne extends true ? Child : Child[]> {
+  protected buildDictionary(children: Child[]): Record<ID, Population<IsOne, Child>> {
     const keyColumn = this.getColumnForDictionaryKey();
 
-    return children.reduce<Record<ID, IsOne extends true ? Child : Child[]>>((dictionary, child) => {
+    return children.reduce<Record<ID, Population<IsOne, Child>>>((dictionary, child) => {
       const key = child[keyColumn] as ID;
 
       if (this.isToOne()) {
@@ -70,11 +65,11 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   /**
    * Load children and assign them to the given parents.
    */
-  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: IsOne extends true ? Child : Child[] }>>;
+  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: Population<IsOne, Child> }>>;
   load<T>(
     parents: Parent[],
     callback: QBCallback<Child, T>,
-  ): Promise<Array<Parent & { [key in N]: IsOne extends true ? T : T[] }>>;
+  ): Promise<Array<Parent & { [key in N]: Population<IsOne, T> }>>;
   async load<T>(parents: Parent[], callback?: QBCallback<Child, T>) {
     const children = await this.loadChildren(parents, callback);
 

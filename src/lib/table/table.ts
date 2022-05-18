@@ -1,6 +1,6 @@
 import { DB, getDatabase } from '.';
 import { Relation } from '../relations/relation';
-import { QBCallback, Row } from '../types';
+import { Population, QBCallback, Row } from '../types';
 
 export type TableConfig<Model> = {
   // Table's primary key. Default is "id".
@@ -83,12 +83,12 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   load<N extends keyof R>(
     results: Model[],
     relationName: N,
-  ): Promise<Model & { [key in N]: ResolveIsOne<R[N]> extends true ? ResolveChild<R[N]> : ResolveChild<R[N]>[] }>;
+  ): Promise<Model & { [key in N]: Population<ResolveIsOne<R[N]>, ResolveChild<R[N]>> }>;
   load<N extends keyof R, T>(
     results: Model[],
     relationName: N,
     callback: QBCallback<ResolveChild<R[N]>, T>,
-  ): Promise<Model & { [key in N]: ResolveIsOne<R[N]> extends true ? T : T[] }>;
+  ): Promise<Model & { [key in N]: Population<ResolveIsOne<R[N]>, T> }>;
   load<N extends keyof R, T>(results: Model[], relationName: N, callback?: QBCallback<ResolveChild<R[N]>, T>) {
     const relation = this.getRelation(relationName);
 

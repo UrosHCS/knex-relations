@@ -1,6 +1,7 @@
 import { Row } from '../types';
 import { Relation } from './relation';
 import { ID } from '.';
+import { Knex } from 'knex';
 
 export class BelongsToMany<Parent extends Row, Child extends Row, N extends string> extends Relation<
   Parent,
@@ -8,7 +9,7 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
   N,
   false
 > {
-  queryFor(parentIds: ID[]) {
+  queryFor(parentIds: ID[]): Knex.QueryBuilder<Child> {
     const pivotTable = this.getPivotTableName();
 
     return this.childTable

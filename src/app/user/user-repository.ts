@@ -11,6 +11,9 @@ class UserRepository extends Repository<User> {
     });
     const withPosts = await this.table.load(users, 'posts');
     const withFriends = await this.table.load(users, 'friends');
+    const withFriends2 = await this.table.relations.friends.load(users, qb => {
+      return qb.select('email').then(rows => rows);
+    });
 
     return withPosts;
   }
