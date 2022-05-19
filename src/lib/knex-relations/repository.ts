@@ -1,5 +1,4 @@
-import { Table } from '.';
-import { Row } from '../types';
+import { Table, Row } from '.';
 
 export abstract class Repository<TRecord extends Row> {
   abstract table: Table<TRecord>;

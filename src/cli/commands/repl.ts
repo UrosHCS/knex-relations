@@ -1,7 +1,7 @@
 import { Command } from '..';
 import { boot } from '../../core';
+import { getDatabase } from '../../lib/knex-relations';
 import { runRepl } from '../../lib/repl/repl';
-import { getDatabase } from '../../lib/table';
 
 export const replCommand: Command = {
   name: 'repl',

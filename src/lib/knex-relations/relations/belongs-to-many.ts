@@ -1,8 +1,10 @@
-import { Row } from '../types';
-import { Relation } from './relation';
-import { ID } from '.';
 import { Knex } from 'knex';
 
+import { Row, ID, Relation } from '..';
+
+/**
+ * many-to-many relation
+ */
 export class BelongsToMany<Parent extends Row, Child extends Row, N extends string> extends Relation<
   Parent,
   Child,
@@ -18,32 +20,35 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
       .query()
       .join(
         pivotTable,
-        `${pivotTable}.${this.getChildForeignKey()}`,
+        `${pivotTable}.${this.getPivotChildColumn()}`,
         '=',
         `${this.childTable.name}.${this.childTable.primaryKey}`,
       )
-      .whereIn(`${pivotTable}.${this.getParentForeignKey()}`, parentIds);
+      .whereIn(`${pivotTable}.${this.getPivotParentColumn()}`, parentIds);
   }
 
   protected override getColumnForDictionaryKey(): string {
-    return this.getParentForeignKey();
+    return this.getPivotParentColumn();
   }
 
-  protected override getParentRelationKey() {
+  /**
+   * In many-to-many the parent's primary key is used as the foreign key in the pivot table.
+   */
+  protected override getParentRelationColumn() {
     return this.parentTable.primaryKey;
   }
 
   /**
    * Get column name in pivot table that points to the parent table.
    */
-  private getParentForeignKey() {
+  private getPivotParentColumn() {
     return `${this.parentTable.singular}_id`;
   }
 
   /**
    * Get column name in pivot table that points to the child table.
    */
-  private getChildForeignKey() {
+  private getPivotChildColumn() {
     return `${this.childTable.singular}_id`;
   }
 

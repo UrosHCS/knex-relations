@@ -1,12 +1,11 @@
-import { Table } from '../../lib/table';
-import { BelongsToMany, HasMany } from '../../lib/relations';
+import { Table, BelongsToMany, HasMany } from '../../lib/knex-relations';
 import { Post, postsTable } from '../post/posts-table';
 
-export type User = {
+export interface User {
   id: number;
   email: string;
   name: string;
-};
+}
 
 export type UserRelations = {
   posts: HasMany<User, Post, 'posts'>;

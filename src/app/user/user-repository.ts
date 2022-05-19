@@ -1,4 +1,5 @@
-import { Repository } from '../../lib/table';
+import { Repository } from '../../lib/knex-relations';
+
 import { User, usersTable } from './users-table';
 
 class UserRepository extends Repository<User> {

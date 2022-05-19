@@ -1,4 +1,5 @@
 import { argv } from 'process';
+
 import { commands } from './commands';
 
 const [, , commandName, ...args] = argv;

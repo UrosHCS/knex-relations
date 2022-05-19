@@ -1,4 +1,5 @@
-import { setDatabase } from '../lib/table';
+import { setDatabase } from '../lib/knex-relations';
+
 import { connect } from './db';
 
 export async function boot() {

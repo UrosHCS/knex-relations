@@ -1,7 +1,6 @@
 import { Knex } from 'knex';
-import { Table } from '../table/table';
-import { ChildShape, QBCallback, Row } from '../types';
-import { ID } from '.';
+
+import { Table, ChildShape, ID, QBCallback, Row } from '..';
 
 export abstract class Relation<Parent extends Row, Child extends Row, N extends string, IsOne extends boolean> {
   /**
@@ -22,11 +21,18 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   /**
    * Get column name in the parent table that points to the child table.
    */
-  protected abstract getParentRelationKey(): keyof Parent;
+  protected abstract getParentRelationColumn(): keyof Parent;
 
   /**
    * Column in loaded child that will be used to build the dictionary. The
    * same column that corresponds to the parent's foreign key or id.
+   *
+   * Note: when the return type is "keyof Child", the ResolveChild<R[N]> will
+   * not work in the Table.load() method. Wat?
+   *
+   * Also, in BelongsToMany, the returned colum is the joined column from the
+   * pivot table, so that is another reason why the return type of this method
+   * should not be "keyof Child".
    */
   protected abstract getColumnForDictionaryKey(): string;
 
@@ -55,7 +61,7 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
     const empty = this.emptyRelation();
 
     for (const parent of parents) {
-      const value = parent[this.getParentRelationKey()] as ID;
+      const value = parent[this.getParentRelationColumn()] as ID;
       const children = childDictionary[value];
       this.setRelation(parent, children || empty);
     }
@@ -65,9 +71,9 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
    * Return a promise that resolves to an array of child models or any value returned from the callback
    */
   loadChildren<T>(parents: Parent[], callback?: QBCallback<Child, T>): Promise<Array<Child | T>> {
-    const key = this.getParentRelationKey();
+    const key = this.getParentRelationColumn();
 
-    const ids = parents.map(parent => parent[key] as ID);
+    const ids = parents.map(parent => this.getIdValue(parent, key));
 
     const qb = this.queryFor(ids);
 
@@ -98,10 +104,10 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   protected singleChildDictionaryReducer(
     dictionary: Record<ID, Child>,
     child: Child,
-    keyColumn: string,
+    keyColumn: keyof Child,
   ): Record<ID, Child> {
-    const key = child[keyColumn] as ID;
-    dictionary[key] = child;
+    const value = this.getIdValue(child, keyColumn);
+    dictionary[value] = child;
     return dictionary;
   }
 
@@ -111,13 +117,13 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   protected childArrayDictionaryReducer(
     dictionary: Record<ID, Child[]>,
     child: Child,
-    keyColumn: string,
+    keyColumn: keyof Child,
   ): Record<ID, Child[]> {
-    const key = child[keyColumn] as ID;
-    if (!dictionary[key]) {
-      dictionary[key] = [];
+    const value = this.getIdValue(child, keyColumn);
+    if (!dictionary[value]) {
+      dictionary[value] = [];
     }
-    dictionary[key].push(child);
+    dictionary[value].push(child);
     return dictionary;
   }
 
@@ -136,5 +142,12 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
    */
   private emptyRelation() {
     return this.isToOne ? null : [];
+  }
+
+  /**
+   * Method that deals with casting the accessed property to ID
+   */
+  private getIdValue<T extends Parent | Child>(row: T, column: keyof T): ID {
+    return row[column] as ID;
   }
 }

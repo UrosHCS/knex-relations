@@ -1,6 +1,4 @@
-import { DB, getDatabase } from '.';
-import { Relation } from '../relations/relation';
-import { ChildShape, QBCallback, Row } from '../types';
+import { DB, getDatabase, ChildShape, QBCallback, Row, Relation } from '.';
 
 export type TableConfig<Model> = {
   // Table's primary key. Default is "id".
@@ -32,7 +30,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     private relationBuilder?: RelationBuilder<Model, R>,
     config?: TableConfig<Model>,
   ) {
-    this.primaryKey = config?.primaryKey ?? DEFAULT_PRIMARY_KEY;
+    this.primaryKey = (config?.primaryKey ?? DEFAULT_PRIMARY_KEY) as keyof Model;
     this.db = this.resolveDb(config?.db);
   }
 
@@ -65,6 +63,10 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
 
   private dbIsFunction<Model>(db: TableConfig<Model>['db']): db is () => DB {
     return typeof db === 'function';
+  }
+
+  capitalizeSingular() {
+    return this.singular.charAt(0).toUpperCase() + this.singular.slice(1);
   }
 
   /**

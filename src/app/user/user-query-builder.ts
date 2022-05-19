@@ -1,4 +1,5 @@
-import { QueryBuilder } from '../../lib/table/query-builder';
+import { QueryBuilder } from '../../lib/knex-relations';
+
 import { User, UserRelations, usersTable } from './users-table';
 
 export class UserQueryBuilder extends QueryBuilder<User, UserRelations> {

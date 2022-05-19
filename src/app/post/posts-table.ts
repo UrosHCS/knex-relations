@@ -1,12 +1,11 @@
+import { Table, BelongsTo } from '../../lib/knex-relations';
 import { User, usersTable } from '../user/users-table';
-import { BelongsTo } from '../../lib/relations';
-import { Table } from '../../lib/table';
 
-export type Post = {
+export interface Post {
   id: number;
   body: string;
   user_id: number;
-};
+}
 
 export type PostRelations = {
   user: BelongsTo<Post, User, 'user'>;

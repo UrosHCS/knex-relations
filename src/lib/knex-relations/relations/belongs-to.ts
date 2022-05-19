@@ -1,7 +1,8 @@
-import { Row } from '../types';
-import { Relation } from './relation';
-import { ID } from '.';
+import { Row, ID, Relation } from '..';
 
+/**
+ * many-to-one or one-to-one relation where the parent table has a foreign key to the child table.
+ */
 export class BelongsTo<Parent extends Row, Child extends Row, N extends string> extends Relation<
   Parent,
   Child,
@@ -18,7 +19,10 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
     return this.childTable.primaryKey as string;
   }
 
-  protected override getParentRelationKey() {
+  /**
+   * In many-to-many the parent's primary key is used as the foreign key in the pivot table.
+   */
+  protected override getParentRelationColumn() {
     return `${this.childTable.singular}_id` as keyof Parent;
   }
 }

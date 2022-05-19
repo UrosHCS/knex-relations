@@ -1,4 +1,5 @@
 import knex, { Knex } from 'knex';
+
 import { config } from './config';
 
 let db: Knex;
@@ -13,12 +14,12 @@ export function connect() {
   return db;
 }
 
-export function disconnect() {
+export async function disconnect() {
   if (!db) {
     return;
   }
 
-  db.destroy();
+  await db.destroy();
 }
 
 export { db };

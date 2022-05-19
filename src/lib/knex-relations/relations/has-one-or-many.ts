@@ -1,6 +1,4 @@
-import { Row } from '../types';
-import { Relation } from './relation';
-import { ID } from '.';
+import { Row, ID, Relation } from '..';
 
 export abstract class HasOneOrMany<
   Parent extends Row,
@@ -16,7 +14,7 @@ export abstract class HasOneOrMany<
     return this.getForeignKeyName();
   }
 
-  protected override getParentRelationKey() {
+  protected override getParentRelationColumn() {
     return this.parentTable.primaryKey;
   }
 

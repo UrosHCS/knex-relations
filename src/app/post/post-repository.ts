@@ -1,5 +1,15 @@
-import { Repository } from '../../lib/table';
+import { Repository } from '../../lib/knex-relations';
+import { User } from '../user/users-table';
+
 import { Post, postsTable } from './posts-table';
+
+interface PostWithUser extends Post {
+  user: User;
+}
+
+interface PostWithPartialUser extends Post {
+  user: Pick<User, 'id' | 'email'>;
+}
 
 class PostRepository extends Repository<Post> {
   table = postsTable;
@@ -8,23 +18,26 @@ class PostRepository extends Repository<Post> {
     return this.select().limit(10);
   }
 
-  async withUser() {
+  async withUser(): Promise<PostWithUser[]> {
     return this.table.load(await this.bunch(), 'user');
   }
 
-  async withUserUsingRelationsDirectly() {
+  async withUserUsingRelationsDirectly(): Promise<PostWithUser[]> {
     return this.table.relations.user.load(await this.select().limit(10));
   }
 
-  async withReducedUser() {
-    return this.table.load(await this.bunch(), 'user', qb => {
-      return qb.select('id', 'email').then(rows => rows);
+  async withReducedUser(): Promise<PostWithPartialUser[]> {
+    return this.table.load(await this.bunch(), 'user', async qb => {
+      // If we don't make a variable and then return it, the types get messed up
+      const query = qb.select('id', 'email');
+      return query;
     });
   }
 
-  async withReducedUserUsingRelationsDirectly() {
+  async withReducedUserUsingRelationsDirectly(): Promise<PostWithPartialUser[]> {
     return this.table.relations.user.load(await this.bunch(), qb => {
-      return qb.select('id', 'email').then(rows => rows);
+      // Here, calling then is enough to fix the types problem
+      return qb.select('id', 'email').then(res => res);
     });
   }
 }
