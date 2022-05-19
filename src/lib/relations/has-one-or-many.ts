@@ -9,21 +9,21 @@ export abstract class HasOneOrMany<
   IsOne extends boolean,
 > extends Relation<Parent, Child, N, IsOne> {
   queryFor(parentIds: ID[]) {
-    return this.childTable.query().whereIn(this.getForeignKeyName() as string, parentIds);
+    return this.childTable.query().whereIn(this.getForeignKeyName(), parentIds);
   }
 
-  protected getColumnForDictionaryKey(): string {
-    return this.getForeignKeyName() as string;
+  protected override getColumnForDictionaryKey(): string {
+    return this.getForeignKeyName();
+  }
+
+  protected override getParentRelationKey() {
+    return this.parentTable.primaryKey;
   }
 
   /**
    * Get column name in the child table that points to the parent table.
    */
-  protected getForeignKeyName() {
-    return `${this.parentTable.singular}_id` as keyof Child;
-  }
-
-  protected getParentRelationKey() {
-    return this.parentTable.primaryKey;
+  private getForeignKeyName() {
+    return `${this.parentTable.singular}_id`;
   }
 }

@@ -9,7 +9,7 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
   N,
   false
 > {
-  isToOne: false = false;
+  protected override isToOne: false = false;
 
   queryFor(parentIds: ID[]): Knex.QueryBuilder<Child> {
     const pivotTable = this.getPivotTableName();
@@ -25,21 +25,11 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
       .whereIn(`${pivotTable}.${this.getParentForeignKey()}`, parentIds);
   }
 
-  mapChildrenToParents(parents: Parent[], children: Child[]): void {
-    const childDictionary = this.buildDictionary(children);
-
-    for (const parent of parents) {
-      const parentPK = parent[this.parentTable.primaryKey] as ID;
-      const childrenOfParent = childDictionary[parentPK];
-      this.setRelation(parent, childrenOfParent || []);
-    }
-  }
-
-  protected getColumnForDictionaryKey(): string {
+  protected override getColumnForDictionaryKey(): string {
     return this.getParentForeignKey();
   }
 
-  protected getParentRelationKey() {
+  protected override getParentRelationKey() {
     return this.parentTable.primaryKey;
   }
 

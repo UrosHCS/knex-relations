@@ -4,6 +4,11 @@ import { ChildShape, QBCallback, Row } from '../types';
 import { ID } from '.';
 
 export abstract class Relation<Parent extends Row, Child extends Row, N extends string, IsOne extends boolean> {
+  /**
+   * Boolean if the relation is a *-to-one relation.
+   */
+  protected abstract isToOne: IsOne;
+
   constructor(readonly parentTable: Table<Parent>, readonly childTable: Table<Child>, readonly relationName: N) {}
 
   /**
@@ -15,16 +20,56 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   abstract queryFor(ids: ID[]): Knex.QueryBuilder<Child>;
 
   /**
-   * Boolean if the relation is a *-to-one relation.
+   * Get column name in the parent table that points to the child table.
    */
-  abstract isToOne: IsOne;
+  protected abstract getParentRelationKey(): keyof Parent;
+
+  protected abstract getColumnForDictionaryKey(): string;
+
+  /**
+   * Load children and assign them to the given parents.
+   */
+  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: ChildShape<IsOne, Child> }>>;
+  load<T>(
+    parents: Parent[],
+    callback: QBCallback<Child, T>,
+  ): Promise<Array<Parent & { [key in N]: ChildShape<IsOne, T> }>>;
+  async load<T>(parents: Parent[], callback?: QBCallback<Child, T>) {
+    const children = await this.loadChildren(parents, callback);
+
+    this.mapChildrenToParents(parents, children as Child[]);
+
+    return parents;
+  }
 
   /**
    * Assign the given children to the given parents, where the key will be the relationName.
    */
-  abstract mapChildrenToParents(parents: Parent[], children: Child[]): void;
+  mapChildrenToParents(parents: Parent[], children: Child[]): void {
+    const childDictionary = this.buildDictionary(children);
 
-  protected abstract getColumnForDictionaryKey(): string;
+    const empty = this.emptyRelation();
+
+    for (const parent of parents) {
+      const value = parent[this.getParentRelationKey()] as ID;
+      const children = childDictionary[value];
+      this.setRelation(parent, children || empty);
+    }
+  }
+
+  loadChildren<T>(parents: Parent[], callback?: QBCallback<Child, T>): Promise<Array<Child | T>> {
+    const key = this.getParentRelationKey();
+
+    const ids = parents.map(parent => parent[key] as ID);
+
+    const qb = this.queryFor(ids);
+
+    if (callback) {
+      return callback(qb);
+    }
+
+    return qb;
+  }
 
   protected buildDictionary(children: Child[]): Record<ID, ChildShape<IsOne, Child>> {
     const keyColumn = this.getColumnForDictionaryKey();
@@ -60,43 +105,12 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
     return dictionary;
   }
 
-  loadChildren<T>(parents: Parent[], callback?: QBCallback<Child, T>): Promise<Array<Child | T>> {
-    const key = this.getParentRelationKey();
-
-    const ids = parents.map(parent => parent[key] as ID);
-
-    const qb = this.queryFor(ids);
-
-    if (callback) {
-      return callback(qb);
-    }
-
-    return qb;
-  }
-
-  /**
-   * Load children and assign them to the given parents.
-   */
-  load(parents: Parent[]): Promise<Array<Parent & { [key in N]: ChildShape<IsOne, Child> }>>;
-  load<T>(
-    parents: Parent[],
-    callback: QBCallback<Child, T>,
-  ): Promise<Array<Parent & { [key in N]: ChildShape<IsOne, T> }>>;
-  async load<T>(parents: Parent[], callback?: QBCallback<Child, T>) {
-    const children = await this.loadChildren(parents, callback);
-
-    this.mapChildrenToParents(parents, children as Child[]);
-
-    return parents;
-  }
-
-  /**
-   * Get column name in the parent table that points to the child table.
-   */
-  protected abstract getParentRelationKey(): keyof Parent;
-
   protected setRelation(parent: Parent, children: unknown): void {
     // @ts-expect-error - We are adding new properties here, which is not something that TS likes.
     parent[this.relationName] = children;
+  }
+
+  private emptyRelation() {
+    return this.isToOne ? null : [];
   }
 }

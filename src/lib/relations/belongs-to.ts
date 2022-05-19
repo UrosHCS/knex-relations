@@ -8,7 +8,7 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
   N,
   true
 > {
-  isToOne: true = true;
+  protected override isToOne: true = true;
 
   queryFor(parentForeignIds: ID[]) {
     return this.childTable.query().whereIn(this.childTable.primaryKey as string, parentForeignIds);
@@ -24,14 +24,11 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
     }
   }
 
-  protected getColumnForDictionaryKey(): string {
+  protected override getColumnForDictionaryKey(): string {
     return this.childTable.primaryKey as string;
   }
 
-  /**
-   * Get column name in the parent table that points to the child table.
-   */
-  protected getParentRelationKey() {
+  protected override getParentRelationKey() {
     return `${this.childTable.singular}_id` as keyof Parent;
   }
 }
