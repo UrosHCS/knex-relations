@@ -36,6 +36,10 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     this.db = this.resolveDb(config?.db);
   }
 
+  /**
+   * Relations (can) have circular dependencies, so we need this method to solve the
+   * issues that come with circular dependencies.
+   */
   init(): this {
     if (this.relationBuilder) {
       this.relations = this.relationBuilder(this);
@@ -46,6 +50,11 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return this;
   }
 
+  /**
+   * If there is a db object in the config, return it.
+   * Else, check if it is set with the setDatabase(db) function.
+   * The getDatabase() function will fail if there is no db object.
+   */
   private resolveDb<Model>(db: TableConfig<Model>['db']): DB {
     if (!db) {
       return getDatabase();
@@ -58,18 +67,27 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return typeof db === 'function';
   }
 
+  /**
+   * Make a query FROM the current table.
+   */
   query() {
     return this.db<Model>(this.name);
   }
 
+  /**
+   * Load multiple relations by their names.
+   */
   async loadMany(results: Model[], relationNames: string[]): Promise<void> {
     await Promise.all(
       relationNames.map(relationName => {
-        this.load(results, relationName);
+        return this.load(results, relationName);
       }),
     );
   }
 
+  /**
+   * Check if the relation exists on this table and return it.
+   */
   getRelation<N extends keyof R>(relationName: N): R[N] {
     const relation = this.relations[relationName];
 
@@ -80,6 +98,10 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return relation;
   }
 
+  /**
+   * Load a relation by its name. Optionally pass a callback
+   * that can manipulate the children query before it is executed.
+   */
   load<N extends keyof R>(
     results: Model[],
     relationName: N,
@@ -99,6 +121,9 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return relation.load(results);
   }
 
+  /**
+   * Load a nested relation, separated by the dot notation.
+   */
   async loadNested<T extends Model[]>(results: Model[], nestedRelationNames: string): Promise<T> {
     const relationNames = nestedRelationNames.split('.');
 
@@ -108,6 +133,9 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return this.doLoadNested(results, relationNames);
   }
 
+  /**
+   * Recursive function that performs the actual loading of nested relations.
+   */
   private async doLoadNested<T extends Model[]>(results: Model[], nestedRelationNames: string[]): Promise<T> {
     if (nestedRelationNames.length === 0) {
       return results as T;

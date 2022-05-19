@@ -13,6 +13,7 @@
     "outDir": "./dist",
     "incremental": true,
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    "noImplicitOverride": true
   },
   "exclude": ["tests"],
 }

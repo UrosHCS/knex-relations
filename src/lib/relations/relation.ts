@@ -24,6 +24,10 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
    */
   protected abstract getParentRelationKey(): keyof Parent;
 
+  /**
+   * Column in loaded child that will be used to build the dictionary. The
+   * same column that corresponds to the parent's foreign key or id.
+   */
   protected abstract getColumnForDictionaryKey(): string;
 
   /**
@@ -57,6 +61,9 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
     }
   }
 
+  /**
+   * Return a promise that resolves to an array of child models or any value returned from the callback
+   */
   loadChildren<T>(parents: Parent[], callback?: QBCallback<Child, T>): Promise<Array<Child | T>> {
     const key = this.getParentRelationKey();
 
@@ -71,6 +78,9 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
     return qb;
   }
 
+  /**
+   * Build a hash map of children so that we can map them to parents in a more performant way.
+   */
   protected buildDictionary(children: Child[]): Record<ID, ChildShape<IsOne, Child>> {
     const keyColumn = this.getColumnForDictionaryKey();
 
@@ -82,6 +92,9 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
     return children.reduce<Record<ID, ChildShape<IsOne, Child>>>(reducer as any, {});
   }
 
+  /**
+   * Dictionary builder for *-to-one relations.
+   */
   protected singleChildDictionaryReducer(
     dictionary: Record<ID, Child>,
     child: Child,
@@ -92,6 +105,9 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
     return dictionary;
   }
 
+  /**
+   * Dictionary builder for *-to-many relations.
+   */
   protected childArrayDictionaryReducer(
     dictionary: Record<ID, Child[]>,
     child: Child,
@@ -105,11 +121,19 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
     return dictionary;
   }
 
+  /**
+   * Sets a new property on the given parent object. The property name is the relation name.
+   * The property value is the given child/children.
+   */
   protected setRelation(parent: Parent, children: unknown): void {
     // @ts-expect-error - We are adding new properties here, which is not something that TS likes.
     parent[this.relationName] = children;
   }
 
+  /**
+   * For *-to-one relations, the empty relation is null.
+   * For *-to-many relations, the empty relation is an empty array.
+   */
   private emptyRelation() {
     return this.isToOne ? null : [];
   }
