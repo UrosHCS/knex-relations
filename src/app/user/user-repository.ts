@@ -4,32 +4,48 @@ import { User, usersTable } from './users-table';
 class UserRepository extends Repository<User> {
   table = usersTable;
 
-  async test() {
-    const users = await this.query().limit(10);
-    const specialUsers = await this.table.load(users, 'posts', async qb => {
-      return qb.select('body').then(rows => rows);
-    });
-    const withPosts = await this.table.load(users, 'posts');
-    const withFriends = await this.table.load(users, 'friends');
-    const withFriends2 = await this.table.relations.friends.load(users, qb => {
-      return qb.select('email').then(rows => rows);
-    });
-
-    return withPosts;
+  bunch() {
+    return this.select().limit(10);
   }
 
-  latest(limit: number) {
-    return this.query().orderBy('id').limit(limit);
+  async withPosts() {
+    return this.table.load(await this.bunch(), 'posts');
   }
 
-  async miniUsers() {
-    const miniUsers = await this.query()
-      .select('id', 'email')
-      .where(qb => {
-        qb.where({ name: 'John' });
-      });
+  async withPostsUsingRelationsDirectly() {
+    return this.table.relations.posts.load(await this.bunch());
+  }
 
-    return miniUsers;
+  async withReducedPosts() {
+    return this.table.load(await this.bunch(), 'posts', qb => {
+      return qb.select('id', 'body').then(rows => rows);
+    });
+  }
+
+  async withReducedPostsUsingRelationsDirectly() {
+    return this.table.relations.posts.load(await this.bunch(), qb => {
+      return qb.select('id', 'body').then(rows => rows);
+    });
+  }
+
+  async withFriends() {
+    return this.table.load(await this.bunch(), 'friends');
+  }
+
+  async withFriendsUsingRelationsDirectly() {
+    return this.table.relations.friends.load(await this.bunch());
+  }
+
+  async withReducedFriends() {
+    return this.table.load(await this.bunch(), 'friends', qb => {
+      return qb.select('id', 'email').then(rows => rows);
+    });
+  }
+
+  async withReducedFriendsUsingRelationsDirectly() {
+    return this.table.relations.friends.load(await this.bunch(), qb => {
+      return qb.select('id', 'email').then(rows => rows);
+    });
   }
 }
 

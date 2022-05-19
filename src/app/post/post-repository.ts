@@ -4,17 +4,28 @@ import { Post, postsTable } from './posts-table';
 class PostRepository extends Repository<Post> {
   table = postsTable;
 
-  async test() {
-    const posts = await this.select().limit(10);
-    const populatedPosts = await this.table.relations.user.load(posts);
-    const populatedPosts2 = await this.table.load(posts, 'user');
-    const populatedPosts3 = await this.table.load(posts, 'user', qb => {
+  async bunch() {
+    return this.select().limit(10);
+  }
+
+  async withUser() {
+    return this.table.load(await this.bunch(), 'user');
+  }
+
+  async withUserUsingRelationsDirectly() {
+    return this.table.relations.user.load(await this.select().limit(10));
+  }
+
+  async withReducedUser() {
+    return this.table.load(await this.bunch(), 'user', qb => {
       return qb.select('id', 'email').then(rows => rows);
     });
   }
 
-  latest(limit: number) {
-    return this.query().orderBy('id').limit(limit);
+  async withReducedUserUsingRelationsDirectly() {
+    return this.table.relations.user.load(await this.bunch(), qb => {
+      return qb.select('id', 'email').then(rows => rows);
+    });
   }
 }
 
