@@ -28,7 +28,7 @@ class PostRepository extends Repository<Post> {
 
   async withReducedUser(): Promise<PostWithPartialUser[]> {
     return this.table.load(await this.bunch(), 'user', async qb => {
-      // If we don't make a variable and then return it, the types get messed up
+      // To get the right type inferred, we need to make a variable and then return it...
       const query = qb.select('id', 'email');
       return query;
     });
@@ -36,8 +36,9 @@ class PostRepository extends Repository<Post> {
 
   async withReducedUserUsingRelationsDirectly(): Promise<PostWithPartialUser[]> {
     return this.table.relations.user.load(await this.bunch(), qb => {
-      // Here, calling then is enough to fix the types problem
-      return qb.select('id', 'email').then(res => res);
+      // ... or call then()
+      // async await does not work
+      return qb.select('id', 'email').then(rows => rows);
     });
   }
 }

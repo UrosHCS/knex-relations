@@ -1,3 +1,5 @@
+import { Knex } from 'knex';
+
 import { getDatabase } from '.';
 
 export type ID = string | number;
@@ -22,4 +24,6 @@ class Wrapper<T> {
   }
 }
 
+// Without DeferredKeySelection as the second generic parameter in the Knex.QueryBuilder
+// the table.load method would not return the right type for the relation (child).
 export type KnexQB<Model> = ReturnType<Wrapper<Model>['wrapped']>;
