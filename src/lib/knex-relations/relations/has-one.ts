@@ -1,5 +1,6 @@
-import { Row, HasOneOrMany } from '..';
+import { Row } from '..';
 
+import { HasOneOrMany } from './has-one-or-many';
 /**
  * one-to-one relation where the child table has a foreign key to the parent table.
  */

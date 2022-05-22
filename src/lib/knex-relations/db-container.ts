@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 
 export type DB = Knex;
 
-let db: DB;
+let db: DB | undefined;
 
 export function getDatabase(): DB {
   if (!db) {
@@ -14,6 +14,13 @@ export function getDatabase(): DB {
 
 export function setDatabase(database: DB): void {
   db = database;
+}
+
+/**
+ * For tests teardown.
+ */
+export function unsetDatabase(): void {
+  db = undefined;
 }
 
 export { db };

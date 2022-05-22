@@ -1,4 +1,4 @@
-import { db } from '.';
+import { getDatabase } from '.';
 
 export type ID = string | number;
 
@@ -18,7 +18,7 @@ export type ChildShape<IsOne, T> = IsOne extends true ? T : T[];
 class Wrapper<T> {
   // wrapped has no explicit return type so we can infer it
   wrapped() {
-    return db<T>('any');
+    return getDatabase()<T>('any');
   }
 }
 

@@ -1,6 +1,8 @@
 import { Knex } from 'knex';
 
-import { Row, ID, Relation } from '..';
+import { Row, ID } from '..';
+
+import { Relation } from './relation';
 
 /**
  * many-to-many relation

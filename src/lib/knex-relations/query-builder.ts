@@ -26,23 +26,4 @@ export class QueryBuilder<Model extends Row, R extends RelationsMap<Model> = Rel
     this.query.where('id', id as unknown as ID);
     return this;
   }
-
-  async get(): Promise<Model[]> {
-    const result = await this.query;
-    return result as Model[];
-  }
-
-  async first(): Promise<Model | undefined> {
-    const result = await this.query.first();
-    return result as Model | undefined;
-  }
-
-  async firstOrFail(): Promise<Model> {
-    const result = await this.first();
-    if (!result) {
-      throw new Error(`${this.table.capitalizeSingular()} not found`);
-    }
-
-    return result;
-  }
 }

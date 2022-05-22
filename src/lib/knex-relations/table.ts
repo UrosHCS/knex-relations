@@ -1,4 +1,6 @@
-import { DB, getDatabase, ChildShape, QBCallback, Row, Relation } from '.';
+import { Relation } from './relations/relation';
+
+import { DB, getDatabase, ChildShape, QBCallback, Row } from '.';
 
 export type TableConfig<Model> = {
   // Table's primary key. Default is "id".

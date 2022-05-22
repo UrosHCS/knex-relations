@@ -10,8 +10,4 @@ export abstract class Repository<TRecord extends Row> {
   select(columns: string | string[] = '*') {
     return this.query().select(columns);
   }
-
-  first() {
-    return this.query().first();
-  }
 }

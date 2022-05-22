@@ -1,5 +1,6 @@
-import { Row, ID, Relation } from '..';
+import { Row, ID } from '..';
 
+import { Relation } from './relation';
 /**
  * many-to-one or one-to-one relation where the parent table has a foreign key to the child table.
  */

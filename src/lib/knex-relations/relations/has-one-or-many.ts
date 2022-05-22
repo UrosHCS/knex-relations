@@ -1,4 +1,6 @@
-import { Row, ID, Relation } from '..';
+import { Row, ID } from '..';
+
+import { Relation } from './relation';
 
 export abstract class HasOneOrMany<
   Parent extends Row,
