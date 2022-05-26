@@ -1,8 +1,10 @@
-import knex, { Knex } from 'knex';
+import knex from 'knex';
+
+import { DB } from '../lib/knex-relations';
 
 import { config } from './config';
 
-let db: Knex;
+let db: DB;
 
 export function connect() {
   if (db) {

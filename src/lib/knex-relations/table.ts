@@ -1,5 +1,7 @@
 import { Relation } from './relations/relation';
 
+import { RelationsMap } from './types';
+
 import { DB, getDatabase, ChildShape, QBCallback, Row } from '.';
 
 export type TableConfig<Model> = {
@@ -9,15 +11,10 @@ export type TableConfig<Model> = {
   db?: DB | (() => DB);
 };
 
-/**
- * Generic relations map.
- */
-export type RelationsMap<Parent extends Row> = Record<string, Relation<Parent, any, string, boolean>>;
+type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
 
-export type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
-
-export type ResolveChild<T> = T extends Relation<any, infer Child, any, any> ? Child : never;
-export type ResolveIsOne<T> = T extends Relation<any, any, any, infer IsOne> ? IsOne : never;
+type ResolveChild<T> = T extends Relation<any, infer Child, any, any> ? Child : never;
+type ResolveIsOne<T> = T extends Relation<any, any, any, infer IsOne> ? IsOne : never;
 
 const DEFAULT_PRIMARY_KEY = 'id';
 
@@ -29,7 +26,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   constructor(
     readonly name: string,
     readonly singular: string,
-    private relationBuilder?: RelationBuilder<Model, R>,
+    private relationBuilder?: RelationBuilder<Model, R> | null,
     config?: TableConfig<Model>,
   ) {
     this.primaryKey = (config?.primaryKey ?? DEFAULT_PRIMARY_KEY) as keyof Model;
@@ -76,6 +73,13 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
    */
   query() {
     return this.db<Model>(this.name);
+  }
+
+  async create(attributes: Partial<Model>): Promise<Model> {
+    const model = (await this.query()
+      .returning('*')
+      .insert(attributes as any)) as unknown as Model;
+    return model;
   }
 
   /**
