@@ -38,7 +38,7 @@ export abstract class Factory<T> {
       creators.push(this.create(attributes));
     }
 
-    return Promise.all(creators);
+    return await Promise.all(creators);
   }
 
   async makeMany(amount: number, attributes: Partial<T> = {}): Promise<Partial<T>[]> {

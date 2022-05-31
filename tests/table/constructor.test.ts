@@ -6,7 +6,9 @@ test.group('Table constructor logic', group => {
   let mockDb: DB;
 
   group.setup(() => {
-    mockDb = {} as DB;
+    mockDb = (() => {
+      // empty function
+    }) as DB;
     setDatabase(mockDb);
   });
 
@@ -21,7 +23,7 @@ test.group('Table constructor logic', group => {
     expect(table.singular).toBe('user');
     expect(table.relations).toEqual({});
     expect(table.primaryKey).toEqual('id');
-    expect(table.db).toBe(mockDb);
+    expect(table.db).toBe(null);
   });
 
   test('relations property is an empty object before init', ({ expect }) => {
@@ -50,8 +52,12 @@ test.group('Table constructor logic', group => {
   });
 
   test('db can be set', ({ expect }) => {
-    const db = {} as DB;
+    const db = (() => {
+      // different empty function
+    }) as DB;
+
     const table = new Table('users', 'user', () => ({}), { db });
+    table.query();
     expect(table.db).not.toBe(mockDb);
     expect(table.db).toBe(db);
   });

@@ -13,10 +13,10 @@ const sqlite: Knex.Config = {
   },
   migrations: {
     tableName: 'migrations',
-    directory: './dist/database/migrations',
+    directory: './src/database/migrations',
   },
   seeds: {
-    directory: './dist/database/seeds',
+    directory: './src/database/seeds',
   },
   useNullAsDefault: true,
 };

@@ -1,6 +1,7 @@
 import { Knex } from 'knex';
 
 export function up(knex: Knex) {
+  console.log('creating users table');
   return knex.schema.createTable('users', table => {
     table.increments('id');
     table.string('name');
@@ -10,5 +11,5 @@ export function up(knex: Knex) {
 }
 
 export function down(knex: Knex) {
-  return knex.schema.dropTable('users');
+  return knex.schema.dropTableIfExists('users');
 }

@@ -8,8 +8,8 @@ export async function boot() {
   // and set the database instance to the global variable
   setDatabase(db);
 
-  await db.migrate.up();
-  await db.seed.run();
+  // await db.migrate.up();
+  // await db.seed.run();
 
   // Import the app asynchronously because table creation needs to wait for the database to be connected
   const app = await import('../app');

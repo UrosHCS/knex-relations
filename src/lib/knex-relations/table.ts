@@ -8,7 +8,7 @@ export type TableConfig<Model> = {
   // Table's primary key. Default is "id".
   primaryKey?: keyof Model;
   // Database connection or a function that returns it.
-  db?: DB | (() => DB);
+  db?: DB;
 };
 
 type RelationBuilder<Model extends Row, R extends RelationsMap<Model>> = (table: Table<Model, R>) => R;
@@ -20,17 +20,17 @@ const DEFAULT_PRIMARY_KEY = 'id';
 
 export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsMap<Model>> {
   relations: R = {} as R;
-  readonly primaryKey: keyof Model;
-  readonly db: DB;
+  primaryKey: keyof Model;
+  db: DB | null;
 
   constructor(
-    readonly name: string,
-    readonly singular: string,
+    public name: string,
+    public singular: string,
     private relationBuilder?: RelationBuilder<Model, R> | null,
     config?: TableConfig<Model>,
   ) {
     this.primaryKey = (config?.primaryKey ?? DEFAULT_PRIMARY_KEY) as keyof Model;
-    this.db = this.resolveDb(config?.db);
+    this.db = config?.db ?? null;
   }
 
   /**
@@ -47,23 +47,6 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     return this;
   }
 
-  /**
-   * If there is a db object in the config, return it.
-   * Else, check if it is set with the setDatabase(db) function.
-   * The getDatabase() function will fail if there is no db object.
-   */
-  private resolveDb<Model>(db: TableConfig<Model>['db']): DB {
-    if (!db) {
-      return getDatabase();
-    }
-
-    return this.dbIsFunction(db) ? db() : db;
-  }
-
-  private dbIsFunction<Model>(db: TableConfig<Model>['db']): db is () => DB {
-    return typeof db === 'function';
-  }
-
   capitalizeSingular() {
     return this.singular.charAt(0).toUpperCase() + this.singular.slice(1);
   }
@@ -72,14 +55,18 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
    * Make a query FROM the current table.
    */
   query() {
+    if (!this.db) {
+      this.db = getDatabase();
+    }
+
     return this.db<Model>(this.name);
   }
 
   async create(attributes: Partial<Model>): Promise<Model> {
-    const model = (await this.query()
+    const model = await this.query()
       .returning('*')
-      .insert(attributes as any)) as unknown as Model;
-    return model;
+      .insert(attributes as any);
+    return model as unknown as Model;
   }
 
   /**

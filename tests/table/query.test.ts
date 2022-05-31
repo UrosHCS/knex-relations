@@ -1,17 +1,16 @@
 import { test } from '@japa/runner';
 
+import { usersTable } from '../../src/app/user/users-table';
+
 import { DB, Table } from '../../src/lib/knex-relations';
 import { UserFactory } from '../factories/user.factory';
 import { dbSetupMigrate, dbTeardown } from '../setup';
 
 test.group('Table constructor logic', group => {
   let db: DB;
-  let app: any;
 
   group.setup(async () => {
-    const setup = await dbSetupMigrate();
-    db = setup.db;
-    app = setup.app;
+    db = await dbSetupMigrate();
   });
 
   group.teardown(() => {
@@ -24,7 +23,23 @@ test.group('Table constructor logic', group => {
   });
 
   test('it returns results of the query when awaited', async ({ expect }) => {
-    const users = new UserFactory().createMany(3);
-    expect(await app.userModule.table.query()).toEqual(users);
+    expect(await db('users').select()).toHaveLength(0);
+    // const factory = new UserFactory();
+    const users = await db('users')
+      .returning('*')
+      .insert([
+        {
+          name: 'john',
+          email: 'email',
+        },
+        {
+          name: 'john',
+          email: 'email',
+        },
+      ]);
+    expect(await db('users').select()).toHaveLength(2);
+    const result = await usersTable.query();
+    console.log(result);
+    expect(result).toEqual(users);
   });
 });
