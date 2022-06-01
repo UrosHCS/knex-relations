@@ -22,7 +22,7 @@ test.group('Table constructor logic', group => {
     expect(table.name).toBe('users');
     expect(table.singular).toBe('user');
     expect(table.relations).toEqual({});
-    expect(table.primaryKey).toEqual('id');
+    expect(table.primaryKey).toBe('id');
     expect(table.db).toBe(null);
   });
 

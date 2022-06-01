@@ -63,10 +63,21 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   }
 
   async create(attributes: Partial<Model>): Promise<Model> {
-    const model = await this.query()
+    const rows = await this.query()
       .returning('*')
       .insert(attributes as any);
-    return model as unknown as Model;
+
+    // The type of rows will be number[], since a simple insert statement will return
+    // a single row with the inserted id, which is translated to a number[] type.
+    // Chaining the .returning('*') changes the type to Model[], but knex doesn't
+    // type it correctly, so we need to cast it to Model[] manually.
+    return rows[0] as unknown as Model;
+  }
+
+  async count(column = '*'): Promise<string | number> {
+    const rows = await this.query().count(column, { as: 'count' });
+
+    return rows[0].count;
   }
 
   /**

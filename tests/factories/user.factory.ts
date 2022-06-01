@@ -17,9 +17,7 @@ export abstract class Factory<T> {
   async create(attributes: Partial<T> = {}): Promise<T> {
     attributes = await this.make(attributes);
 
-    const model = await this.table.create(attributes);
-
-    return model;
+    return this.table.create(attributes);
   }
 
   async make(attributes: Partial<T> = {}): Promise<Partial<T>> {

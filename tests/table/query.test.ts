@@ -6,7 +6,7 @@ import { DB, Table } from '../../src/lib/knex-relations';
 import { UserFactory } from '../factories/user.factory';
 import { dbSetupMigrate, dbTeardown } from '../setup';
 
-test.group('Table constructor logic', group => {
+test.group('Table.query method', group => {
   let db: DB;
 
   group.setup(async () => {
@@ -23,23 +23,10 @@ test.group('Table constructor logic', group => {
   });
 
   test('it returns results of the query when awaited', async ({ expect }) => {
-    expect(await db('users').select()).toHaveLength(0);
-    // const factory = new UserFactory();
-    const users = await db('users')
-      .returning('*')
-      .insert([
-        {
-          name: 'john',
-          email: 'email',
-        },
-        {
-          name: 'john',
-          email: 'email',
-        },
-      ]);
-    expect(await db('users').select()).toHaveLength(2);
+    expect(await usersTable.count()).toBe(0);
+    const users = await new UserFactory().createMany(3);
+    expect(await usersTable.count()).toBe(3);
     const result = await usersTable.query();
-    console.log(result);
     expect(result).toEqual(users);
   });
 });

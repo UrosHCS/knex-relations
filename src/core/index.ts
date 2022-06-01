@@ -1,3 +1,4 @@
+import { initApp } from '../app';
 import { setDatabase } from '../lib/knex-relations';
 
 import { connect } from './db';
@@ -11,8 +12,7 @@ export async function boot() {
   // await db.migrate.up();
   // await db.seed.run();
 
-  // Import the app asynchronously because table creation needs to wait for the database to be connected
-  const app = await import('../app');
+  const app = initApp();
 
   return app;
 }
