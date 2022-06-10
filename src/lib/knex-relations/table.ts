@@ -55,11 +55,11 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
    * Make a query FROM the current table.
    */
   query() {
-    if (!this.db) {
-      this.db = getDatabase();
-    }
+    // Don't cache (set the db on this) when getting it from getDatabase() so that
+    // we always get the object from the same module as the getDatabase function
+    const db = this.db ?? getDatabase();
 
-    return this.db<Model>(this.name);
+    return db<Model>(this.name);
   }
 
   async create(attributes: Partial<Model>): Promise<Model> {
@@ -76,7 +76,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
   }
 
   async count(column = '*'): Promise<string | number> {
-    const rows = await this.query().count(column, { as: 'count' });
+    const rows = await this.query().count(column as string, { as: 'count' });
 
     return rows[0].count;
   }

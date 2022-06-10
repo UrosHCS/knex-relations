@@ -2,20 +2,11 @@ import { test } from '@japa/runner';
 
 import { usersTable } from '../../src/app/user/users-table';
 
-import { DB } from '../../src/lib/knex-relations';
 import { UserFactory } from '../factories/user.factory';
-import { dbSetupMigrate, dbTeardown } from '../setup';
+import { dbSetupAndCleanup } from '../setup';
 
 test.group('Table.query method', group => {
-  let db: DB;
-
-  group.setup(async () => {
-    db = await dbSetupMigrate();
-  });
-
-  group.teardown(() => {
-    dbTeardown(db);
-  });
+  group.setup(dbSetupAndCleanup);
 
   test('it returns the knex query builder instance', ({ expect }) => {
     expect(usersTable.query()).toHaveProperty('where');

@@ -32,3 +32,8 @@ export async function dbSetupMigrate(): Promise<DB> {
 
   return db;
 }
+
+export async function dbSetupAndCleanup() {
+  const db = await dbSetupMigrate();
+  return () => dbTeardown(db);
+}

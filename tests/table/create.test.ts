@@ -2,19 +2,10 @@ import { test } from '@japa/runner';
 
 import { usersTable } from '../../src/app/user/users-table';
 
-import { DB } from '../../src/lib/knex-relations';
-import { dbSetupMigrate, dbTeardown } from '../setup';
+import { dbSetupAndCleanup } from '../setup';
 
 test.group('Table.create method', group => {
-  let db: DB;
-
-  group.setup(async () => {
-    db = await dbSetupMigrate();
-  });
-
-  group.teardown(() => {
-    dbTeardown(db);
-  });
+  group.setup(dbSetupAndCleanup);
 
   test('it returns the created instance', async ({ expect }) => {
     const user = await usersTable.create({
