@@ -4,7 +4,7 @@ import { RelationsMap } from './types';
 
 import { DB, getDatabase, ChildShape, QBCallback, Row } from '.';
 
-export type TableConfig<Model> = {
+export type TableConfig<Model extends Row> = {
   // Table's primary key. Default is "id".
   primaryKey?: keyof Model;
   // Database connection or a function that returns it.
@@ -71,6 +71,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     // a single row with the inserted id, which is translated to a number[] type.
     // Chaining the .returning('*') changes the type to Model[], but knex doesn't
     // type it correctly, so we need to cast it to Model[] manually.
+    // We actually just cast the first element from the number type to the Model type.
     return rows[0] as unknown as Model;
   }
 

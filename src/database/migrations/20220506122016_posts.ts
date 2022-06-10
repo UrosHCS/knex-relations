@@ -4,7 +4,7 @@ export function up(knex: Knex) {
   console.log('creating posts table');
   return knex.schema.createTable('posts', table => {
     table.increments('id');
-    table.string('body');
+    table.string('body').notNullable();
     table.integer('user_id').references('id').inTable('users').onDelete('CASCADE');
     table.timestamps(true, true);
   });
