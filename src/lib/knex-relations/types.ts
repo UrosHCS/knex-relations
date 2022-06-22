@@ -11,7 +11,9 @@ export interface Row {
 /**
  * Generic relations map.
  */
-export type RelationsMap<Parent extends Row> = Record<string, Relation<Parent, any, string, boolean>>;
+export interface RelationsMap<Parent extends Row> {
+  [key: string]: Relation<Parent, any, string, boolean>;
+}
 
 /**
  * Callback that accepts a knex query builder and returns a promise of results.

@@ -24,7 +24,7 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
         pivotTable,
         `${pivotTable}.${this.getPivotChildColumn()}`,
         '=',
-        `${this.childTable.name}.${this.childTable.primaryKey}`,
+        `${this.childTable.name}.${this.childTable.primaryKey as string}`,
       )
       .whereIn(`${pivotTable}.${this.getPivotParentColumn()}`, parentIds);
   }

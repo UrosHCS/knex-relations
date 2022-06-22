@@ -99,7 +99,7 @@ export class Table<Model extends Row, R extends RelationsMap<Model> = RelationsM
     const relation = this.relations[relationName];
 
     if (!relation) {
-      throw new Error(`Relation "${relationName}" does not exist.`);
+      throw new Error(`Relation "${relationName as string}" does not exist.`);
     }
 
     return relation;
