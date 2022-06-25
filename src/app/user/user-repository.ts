@@ -7,10 +7,6 @@ interface UserWithPartialPosts extends User {
   posts: Pick<Post, 'id' | 'body'>[];
 }
 
-interface UserWithPartialFriends extends User {
-  friends: Pick<User, 'id' | 'email'>[];
-}
-
 class UserRepository extends Repository<User> {
   table = usersTable;
 
@@ -35,26 +31,6 @@ class UserRepository extends Repository<User> {
   async withReducedPostsUsingRelationsDirectly(): Promise<UserWithPartialPosts[]> {
     return this.table.relations.posts.load(await this.bunch(), qb => {
       return qb.select('id', 'body').then(rows => rows);
-    });
-  }
-
-  async withFriends() {
-    return this.table.load(await this.bunch(), 'friends');
-  }
-
-  async withFriendsUsingRelationsDirectly() {
-    return this.table.relations.friends.load(await this.bunch());
-  }
-
-  async withReducedFriends(): Promise<UserWithPartialFriends[]> {
-    return this.table.load(await this.bunch(), 'friends', qb => {
-      return qb.select('id', 'email').then(rows => rows);
-    });
-  }
-
-  async withReducedFriendsUsingRelationsDirectly(): Promise<UserWithPartialFriends[]> {
-    return this.table.relations.friends.load(await this.bunch(), qb => {
-      return qb.select('id', 'email').then(rows => rows);
     });
   }
 }

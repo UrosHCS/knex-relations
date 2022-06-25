@@ -6,7 +6,7 @@ import { UserFactory } from '../factories/user.factory';
 import { dbSetupAndCleanup } from '../setup';
 
 test.group('Table.query method', group => {
-  group.setup(dbSetupAndCleanup);
+  group.each.setup(dbSetupAndCleanup);
 
   test('it returns the knex query builder instance', ({ expect }) => {
     expect(usersTable.query()).toHaveProperty('where');

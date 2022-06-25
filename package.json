@@ -9,7 +9,7 @@
     "build:watch": "tsc --watch",
     "cli": "node dist/cli",
     "repl": "node dist/cli repl",
-    "test": "node -r ts-node/register tests"
+    "test": "node -r ts-node/register tests --inspect-brk"
   },
   "author": "",
   "license": "ISC",

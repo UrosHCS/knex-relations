@@ -5,7 +5,7 @@ import { usersTable } from '../../src/app/user/users-table';
 import { dbSetupAndCleanup } from '../setup';
 
 test.group('Table.create method', group => {
-  group.setup(dbSetupAndCleanup);
+  group.each.setup(dbSetupAndCleanup);
 
   test('it returns the created instance', async ({ expect }) => {
     const user = await usersTable.create({

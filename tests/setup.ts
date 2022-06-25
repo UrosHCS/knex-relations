@@ -1,6 +1,8 @@
 import knex from 'knex';
 
 import { initApp } from '../src/app';
+import { postsTable } from '../src/app/post/posts-table';
+import { usersTable } from '../src/app/user/users-table';
 import { config } from '../src/core/config';
 import { DB, setDatabase, unsetDatabase } from '../src/lib/knex-relations';
 

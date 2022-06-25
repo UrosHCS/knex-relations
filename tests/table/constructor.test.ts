@@ -5,14 +5,14 @@ import { DB, HasMany, setDatabase, Table, unsetDatabase } from '../../src/lib/kn
 test.group('Table constructor logic', group => {
   let mockDb: DB;
 
-  group.setup(() => {
+  group.each.setup(() => {
     mockDb = (() => {
       // empty function
     }) as DB;
     setDatabase(mockDb);
   });
 
-  group.teardown(() => {
+  group.each.teardown(() => {
     unsetDatabase();
   });
 

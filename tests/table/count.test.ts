@@ -5,7 +5,7 @@ import { usersTable } from '../../src/app/user/users-table';
 import { dbSetupAndCleanup } from '../setup';
 
 test.group('Table.count method', group => {
-  group.setup(dbSetupAndCleanup);
+  group.each.setup(dbSetupAndCleanup);
 
   test('it returns zero if no rows', async ({ expect }) => {
     expect(await usersTable.count()).toBe(0);
