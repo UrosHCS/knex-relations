@@ -4,6 +4,7 @@ import { setDatabase } from '../lib/knex-relations';
 import { connect } from './db';
 
 export async function boot() {
+  process.env.NODE_ENV = 'dev';
   // Connect knex to the database
   const db = connect();
   // and set the database instance to the global variable

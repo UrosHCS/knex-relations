@@ -53,6 +53,19 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   }
 
   /**
+   * Load children and assign them to the given parent.
+   */
+  loadForOne(parent: Parent): Promise<Parent & { [key in N]: ChildShape<IsOne, Child> }>;
+  loadForOne<T>(parent: Parent, callback: QBCallback<Child, T>): Promise<Parent & { [key in N]: ChildShape<IsOne, T> }>;
+  async loadForOne<T>(parent: Parent, callback?: QBCallback<Child, T>) {
+    const children = await this.loadChildren([parent], callback);
+
+    this.mapChildrenToParents([parent], children as Child[]);
+
+    return parent;
+  }
+
+  /**
    * Assign the given children to the given parents, where the key will be the relationName.
    */
   mapChildrenToParents(parents: Parent[], children: Child[]): void {

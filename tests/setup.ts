@@ -22,8 +22,8 @@ export function dbTeardown(db: DB) {
 }
 
 export async function migrate(db: DB): Promise<void> {
-  await db.migrate.down();
-  await db.migrate.up();
+  await db.migrate.rollback();
+  await db.migrate.latest();
 }
 
 export async function dbSetupMigrate(): Promise<DB> {
