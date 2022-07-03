@@ -1,3 +1,5 @@
+import { Knex } from 'knex';
+
 import { Row, ID } from '..';
 
 import { Relation } from './relation';
@@ -8,8 +10,12 @@ export abstract class HasOneOrMany<
   N extends string,
   IsOne extends boolean,
 > extends Relation<Parent, Child, N, IsOne> {
-  queryFor(parentIds: ID[]) {
+  override queryForMany(parentIds: ID[]) {
     return this.childTable.query().whereIn(this.getForeignKeyName(), parentIds);
+  }
+
+  override queryForOne(parentId: ID): Knex.QueryBuilder<Child> {
+    return this.childTable.query().where(this.getForeignKeyName(), parentId);
   }
 
   protected override getColumnForDictionaryKey(): string {

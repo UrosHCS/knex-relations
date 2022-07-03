@@ -1,4 +1,6 @@
-import { Row } from '..';
+import { Knex } from 'knex';
+
+import { Row, ID } from '..';
 
 import { HasOneOrMany } from './has-one-or-many';
 /**
@@ -11,4 +13,8 @@ export class HasOne<Parent extends Row, Child extends Row, N extends string> ext
   true
 > {
   protected override isToOne: true = true;
+
+  override queryForOne(parentId: ID) {
+    return super.queryForOne(parentId).first();
+  }
 }

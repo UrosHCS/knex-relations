@@ -16,7 +16,15 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
    * and belongs-to-many relations, and parent foreign key ids
    * in a belongs-to relation.
    */
-  abstract queryFor(ids: ID[]): Knex.QueryBuilder<Child>;
+  abstract queryForMany(ids: ID[]): Knex.QueryBuilder<Child>;
+
+  /**
+   * Return a query builder that resolves to an array of child models
+   * based on the given id. For has-one, it resolves just one child.
+   * The id is the parent id in a has-many and belongs-to-many
+   * relations, and parent foreign key id in a belongs-to relation.
+   */
+  abstract queryForOne(ids: ID): Knex.QueryBuilder<Child>;
 
   /**
    * Get column name in the parent table that points to the child table.
@@ -58,9 +66,15 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
   loadForOne(parent: Parent): Promise<Parent & { [key in N]: ChildShape<IsOne, Child> }>;
   loadForOne<T>(parent: Parent, callback: QBCallback<Child, T>): Promise<Parent & { [key in N]: ChildShape<IsOne, T> }>;
   async loadForOne<T>(parent: Parent, callback?: QBCallback<Child, T>) {
-    const children = await this.loadChildren([parent], callback);
+    const id = this.getIdValue(parent, this.getParentRelationColumn());
 
-    this.mapChildrenToParents([parent], children as Child[]);
+    let qb: any = this.queryForOne(id);
+
+    if (callback) {
+      qb = callback(qb);
+    }
+
+    this.setRelation(parent, (await qb) || this.emptyRelation());
 
     return parent;
   }
@@ -88,7 +102,7 @@ export abstract class Relation<Parent extends Row, Child extends Row, N extends 
 
     const ids = parents.map(parent => this.getIdValue(parent, key));
 
-    const qb = this.queryFor(ids);
+    const qb = this.queryForMany(ids);
 
     if (callback) {
       return callback(qb);

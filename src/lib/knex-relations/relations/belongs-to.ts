@@ -12,8 +12,15 @@ export class BelongsTo<Parent extends Row, Child extends Row, N extends string> 
 > {
   protected override isToOne: true = true;
 
-  queryFor(parentForeignIds: ID[]) {
+  override queryForMany(parentForeignIds: ID[]) {
     return this.childTable.query().whereIn(this.childTable.primaryKey as string, parentForeignIds);
+  }
+
+  override queryForOne(parentForeignId: ID) {
+    return this.childTable
+      .query()
+      .where(this.childTable.primaryKey as string, parentForeignId)
+      .first();
   }
 
   protected override getColumnForDictionaryKey(): string {

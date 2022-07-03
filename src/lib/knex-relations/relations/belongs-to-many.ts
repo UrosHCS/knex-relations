@@ -15,7 +15,7 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
 > {
   protected override isToOne: false = false;
 
-  queryFor(parentIds: ID[]): Knex.QueryBuilder<Child> {
+  override queryForMany(parentIds: ID[]) {
     const pivotTable = this.getPivotTableName();
 
     return this.childTable
@@ -27,6 +27,20 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
         `${this.childTable.name}.${this.childTable.primaryKey as string}`,
       )
       .whereIn(`${pivotTable}.${this.getPivotParentColumn()}`, parentIds);
+  }
+
+  override queryForOne(parentId: ID) {
+    const pivotTable = this.getPivotTableName();
+
+    return this.childTable
+      .query()
+      .join(
+        pivotTable,
+        `${pivotTable}.${this.getPivotChildColumn()}`,
+        '=',
+        `${this.childTable.name}.${this.childTable.primaryKey as string}`,
+      )
+      .where(`${pivotTable}.${this.getPivotParentColumn()}`, parentId);
   }
 
   protected override getColumnForDictionaryKey(): string {
