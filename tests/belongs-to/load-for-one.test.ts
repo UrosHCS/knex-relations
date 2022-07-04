@@ -1,7 +1,7 @@
 import { test } from '@japa/runner';
 
 import { postsTable } from '../../src/app/post/posts-table';
-import { factories } from '../factories';
+import { factories } from '../../src/database/factories';
 import { dbSetupAndCleanup } from '../setup';
 
 test.group('BelongsTo.loadForOne post', group => {

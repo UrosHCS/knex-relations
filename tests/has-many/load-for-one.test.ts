@@ -1,7 +1,7 @@
 import { test } from '@japa/runner';
 
 import { usersTable } from '../../src/app/user/users-table';
-import { factories } from '../factories';
+import { factories } from '../../src/database/factories';
 import { dbSetupAndCleanup } from '../setup';
 
 test.group('HasMany.loadForOne method', group => {

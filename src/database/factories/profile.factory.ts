@@ -1,5 +1,5 @@
-import { Profile, profilesTable } from '../../src/app/user/profiles-table';
-import { User } from '../../src/app/user/users-table';
+import { Profile, profilesTable } from '../../app/user/profiles-table';
+import { User } from '../../app/user/users-table';
 import { chance } from '../chance';
 
 import { Factory } from './factory';

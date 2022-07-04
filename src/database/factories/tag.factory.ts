@@ -1,4 +1,4 @@
-import { Tag, tagsTable } from '../../src/app/tag/tags-table';
+import { Tag, tagsTable } from '../../app/tag/tags-table';
 import { chance } from '../chance';
 
 import { Factory } from './factory';

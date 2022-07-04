@@ -2,7 +2,7 @@ import { test } from '@japa/runner';
 
 import { usersTable } from '../../src/app/user/users-table';
 
-import { UserFactory } from '../factories/user.factory';
+import { UserFactory } from '../../src/database/factories/user.factory';
 import { dbSetupAndCleanup } from '../setup';
 
 test.group('Table.query method', group => {

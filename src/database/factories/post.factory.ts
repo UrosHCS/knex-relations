@@ -1,5 +1,5 @@
-import { Post, postsTable } from '../../src/app/post/posts-table';
-import { User } from '../../src/app/user/users-table';
+import { Post, postsTable } from '../../app/post/posts-table';
+import { User } from '../../app/user/users-table';
 import { chance } from '../chance';
 
 import { Factory } from './factory';

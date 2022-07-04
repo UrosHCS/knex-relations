@@ -1,7 +1,7 @@
-import { Table } from '../../src/lib/knex-relations';
+import { BaseTable } from '../../lib/knex-relations';
 
 export abstract class Factory<T> {
-  protected abstract table: Table<T>;
+  protected abstract table: BaseTable<T>;
   protected attributes: Partial<T> = {};
 
   abstract definition(attributes: Partial<T>): Promise<Partial<T>> | Partial<T>;

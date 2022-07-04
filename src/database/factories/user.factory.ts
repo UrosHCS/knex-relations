@@ -1,4 +1,4 @@
-import { User, usersTable } from '../../src/app/user/users-table';
+import { User, usersTable } from '../../app/user/users-table';
 import { chance } from '../chance';
 
 import { Factory } from './factory';

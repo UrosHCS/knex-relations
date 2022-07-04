@@ -72,6 +72,6 @@ export class BelongsToMany<Parent extends Row, Child extends Row, N extends stri
    * Generate pivot table name by joining sorted parent and child table names.
    */
   private getPivotTableName(): string {
-    return [this.parentTable.name, this.childTable.name].sort().join('_');
+    return [this.parentTable.singular, this.childTable.singular].sort().join('_');
   }
 }
